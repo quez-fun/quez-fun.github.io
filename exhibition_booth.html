@@ -1,0 +1,271 @@
+<html>
+<title>a visual experiment of industrial exhibition booths</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: blue;
+      overflow: hidden;
+    }
+    canvas {
+      border: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: absolute;
+    }
+    #title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top:5%;
+    }
+    #btn {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom:5%;
+    }
+    button{
+      background-color: white;
+      border: 1px solid black;
+      border-radius: 10px;
+      padding: 5px 8px;
+      margin: 8px;
+    }
+    a{
+      text-decoration: none;
+      color: blue;
+    }
+</style>
+
+<body>
+
+<canvas id="canvas"></canvas>
+<script  id="vertex-shader-3d" type="x-shader/x-vertex">
+    uniform mat4 u_worldViewProjection;
+    attribute vec4 a_position;
+
+    void main() {
+      gl_Position = u_worldViewProjection * a_position;
+    }
+</script>
+<script  id="fragment-shader-3d" type="x-shader/x-fragment">
+    precision highp float;
+
+    void main() {
+      gl_FragColor = vec4(0.05, 0.3,0.8, 0.55);
+    }
+</script>
+
+<script src="./webgl-utils.js"></script>
+<script src="./m4.js"></script>
+
+<script>
+
+  "use strict";
+
+  //canvas & context
+  const canvas = document.querySelector("#canvas");
+  const gl = canvas.getContext("webgl");
+  let aspect = window.innerWidth/window.innerHeight;
+
+  //projection & view
+  const fieldOfViewRadians = degToRad(60);
+  const up = [0, 1, 0];
+  let cameraPosition=[100, 150, 100], targetPosition=[0,0,0];
+  let cameraMatrix = m4.lookAt(cameraPosition, targetPosition, up, m4.identity());
+  let viewMatrix = m4.inverse(cameraMatrix);
+
+  //objects
+  const width = 15.6, height = 10;
+  const rowNum = 15, columnNum = 15;
+  let gapW = -100, gapH = -100;
+  
+  let objects = [];
+  const uniformsThatAreComputedForEachObject = {
+    u_worldViewProjection:   m4.identity(),
+  };
+
+function main() {
+
+  if (!gl) {
+    return;
+  }
+
+  const arrays = {
+     position: { numComponents: 3, data: [-width/2,-height/2,0, width/2,-height/2,0, -width/2,height/2,0, width/2,height/2,0], },
+     indices:  { numComponents: 3, data: [0, 1, 2, 1, 2, 3], },
+  };
+
+  const bufferInfo = webglUtils.createBufferInfoFromArrays(gl, arrays);
+  const programInfo = webglUtils.createProgramInfo(gl, ["vertex-shader-3d", "fragment-shader-3d"]);
+
+  function drawScene() {
+
+    resizeCanvasToDisplaySize(canvas);
+
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(1,1,1,1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    const projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
+    const viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
+
+    gl.useProgram(programInfo.program);
+
+    // Setup all the needed buffers and attributes.
+    webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+
+    gl.disable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    objects.forEach(function(object) {
+
+      let worldMatrix = m4.xRotation(0);
+      worldMatrix = m4.translate(worldMatrix, object.xTranslation, object.yTranslation, object.zTranslation);
+      worldMatrix = m4.yRotate(worldMatrix, object.yRotation);
+
+      // Multiply the matrices.
+      m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
+
+      // Set the uniforms we just computed
+      webglUtils.setUniforms(programInfo, uniformsThatAreComputedForEachObject);
+
+      // Draw the geometry.
+      gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+    
+    });
+
+    requestAnimationFrame(shrink);
+    //requestAnimationFrame(moveCam);
+    //console.log('drawScene');
+
+  }
+    
+  function drawObjects(){
+
+    for (var i = 0; i < rowNum; i++) {
+
+      for(var j = 0; j < columnNum; j++){
+
+        objects.push({
+
+          yRotation: 0,
+          xTranslation: - (width + gapW) * (i-rowNum/2)-width /2 - gapW/2,
+          yTranslation: 0,
+          zTranslation: (j-columnNum/2)*(width+gapH)+gapH/2,
+
+        });
+
+        
+        objects.push({
+
+          yRotation: 0,
+          xTranslation: - (width + gapW) * (i-rowNum/2)-width /2 - gapW/2,
+          yTranslation: 0,
+          zTranslation: (j-columnNum/2)*(width+gapH) + width+gapH/2,
+
+        });
+
+        objects.push({
+
+          yRotation: -Math.PI/2,
+          xTranslation: -(width + gapW)* (i-rowNum/2)  - width - gapW/2,
+          yTranslation: 0,
+          zTranslation: (j-columnNum/2)*(width+gapH) + width/2+gapH/2,
+
+        }); 
+    
+        objects.push({
+
+          yRotation: Math.PI/2,
+          xTranslation: -(width + gapW)* (i-rowNum/2) - gapW/2,
+          yTranslation: 0,
+          zTranslation: (j-columnNum/2)*(width+gapH)  + width/2+gapH/2,
+
+        });
+
+      }
+
+    }
+
+    //console.log(objects);
+  }
+
+  function shrink(){
+
+
+    //if (gapH < 15){ //这个就是最终的位移值
+
+    
+    if (gapH < 45){ //这个就是最终的位移值
+      gapH += 0.5; //速度
+      gapW +=0.5;
+      
+
+      for (var i = 0; i < rowNum; i++) {
+
+        for(var j = 0; j < columnNum; j++){
+        //for(var j = columnNum/2; j < columnNum; j++){
+          //apH *= -1;
+
+          objects[(j+columnNum*i)*4 ].xTranslation = - (width + gapW) * (i-rowNum/2) -width/2 - gapW/2;
+          objects[(j+columnNum*i)*4 +1].xTranslation = - (width + gapW) * (i-rowNum/2)-width /2 - gapW/2;
+          objects[(j+columnNum*i)*4 +2].xTranslation = -(width + gapW)* (i-rowNum/2)  - width - gapW/2;
+          objects[(j+columnNum*i)*4 +3].xTranslation = -(width + gapW)* (i-rowNum/2)  - gapW/2;
+
+          objects[(j+columnNum*i)*4 ].zTranslation = (j-columnNum/2)*(width+gapH)+gapH/2;
+          objects[(j+columnNum*i)*4 +1 ].zTranslation = (j-columnNum/2)*(width+gapH) + width+gapH/2;
+          objects[(j+columnNum*i)*4 +2].zTranslation = (j-columnNum/2)*(width+gapH) + width/2+gapH/2;
+          objects[(j+columnNum*i)*4 +3].zTranslation = (j-columnNum/2)*(width+gapH)  + width/2+gapH/2;
+          
+        }
+
+      }
+
+      requestAnimationFrame(drawScene);
+      //console.log('shrink');
+
+    }
+
+  } 
+
+  drawObjects();
+  drawScene();
+
+  window.addEventListener('resize', drawScene, false);
+
+  //测试动画
+  window.addEventListener('click', shrink, false);
+  
+}
+
+function degToRad(d) {
+    return d * Math.PI / 180;
+  }
+
+function resizeCanvasToDisplaySize(canvas, multiplier) {
+    multiplier = multiplier || 2;
+    const width  = canvas.clientWidth  * multiplier | 0;
+    const height = canvas.clientHeight * multiplier | 0;
+    if (canvas.width !== width ||  canvas.height !== height) {
+      canvas.width  = width;
+      canvas.height = height;
+      aspect = width / height;
+      return true;
+    }
+    return false;
+}
+
+
+main();
+
+</script>
+
+
+</body>
+</html>
