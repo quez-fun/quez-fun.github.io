@@ -7,7 +7,7 @@
     body {
       margin: 0 auto;
       font-family: Arial, Helvetica, sans-serif;
-      color: ##777;
+      color: #777;
       overflow: hidden;
       width: auto;
       height: auto;
@@ -49,9 +49,74 @@
       text-decoration: none;
       color: blue;
     }
+
+    /*
+    span {
+    color: aquamarine;
+    font-weight: 300;
+}
+
+
+    .tag {
+    position: absolute;
+    z-index: 99;
+    display: none;
+    top: 0;
+    left: 0;
+    width: 70px;
+  }
+
+  a {
+    border: 1px solid #1d71b8;
+    background-color: #fff;
+    border-radius: 5px;
+    color: #1d71b8;
+    display: block;
+    font-size: 11px;
+    line-height: 18px;
+    margin: auto;
+    padding: 5px;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  a:before {
+    border: 11px solid transparent;
+    border-bottom: 0;
+    border-top: 11px solid #1d71b8;
+    bottom: 0;
+    content: "";
+    display: block;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, 90%);
+    width: 0;
+  }
+
+  a:after {
+    border: 10px solid transparent;
+    border-bottom: 0;
+    border-top: 10px solid #fff;
+    bottom: 0;
+    content: "";
+    display: block;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, 85%);
+    width: 0;
+  }
+    */
   </style>
 
   <body>
+
+    <!--
+    
+        <span class="tag">
+      <a href="">
+        test tag
+      </a>
+    </span>-->
 
     <div id="title-area">
       <h4>My Projects</h4>
@@ -72,6 +137,27 @@
     void main() {
       gl_FragColor = vec4(0.05, 0.3,0.8, 0.55);
     }
+</script>
+    <script id="pick-vertex-shader-3d" type="x-shader/x-vertex">
+  uniform mat4 u_worldViewProjection;
+  
+  attribute vec4 a_position;
+  
+  void main() {
+    gl_Position = u_worldViewProjection * a_position;
+  }
+</script>
+    <script id="pick-fragment-shader-3d" type="x-shader/x-fragment">
+
+  precision mediump float;
+  
+  uniform vec4 u_id;
+  
+  void main() {
+    gl_FragColor = u_id;
+    //gl_FragColor = vec4(1.0, 0.8, 0.0, 1.0);
+  }
+
 </script>
 
     <script src="./webgl-utils.js"></script>
@@ -103,6 +189,46 @@
         u_worldViewProjection: m4.identity(),
       };
 
+      let initialAnimation = true;
+
+      //create frame buffer
+      const targetTexture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, targetTexture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+
+      const depthBuffer = gl.createRenderbuffer();
+      gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+
+      function setFramebufferAttachmentSizes(width, height) {
+        gl.bindTexture(gl.TEXTURE_2D, targetTexture);
+        const level = 0;
+        const internalFormat = gl.RGBA;
+        const border = 0;
+        const format = gl.RGBA;
+        const type = gl.UNSIGNED_BYTE;
+        const data = null;
+        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+          width, height, border,
+          format, type, data);
+
+        //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.canvas.width * 2, gl.canvas.height * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+      }
+
+      const fb = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb); //这条放出来以后，图形就没了，但也分离了渲染层和pick层
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, targetTexture, 0);
+      gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
+
+      let pickUniforms = {
+        u_worldViewProjection: m4.identity(),
+        u_world: m4.identity(),
+      };
+
       function main() {
 
         if (!gl) {
@@ -116,11 +242,13 @@
 
         const bufferInfo = webglUtils.createBufferInfoFromArrays(gl, arrays);
         const programInfo = webglUtils.createProgramInfo(gl, ["vertex-shader-3d", "fragment-shader-3d"]);
+        const pickProgramInfo = webglUtils.createProgramInfo(gl, ["pick-vertex-shader-3d", "pick-fragment-shader-3d"]);
 
         function drawScene() {
 
           resizeCanvasToDisplaySize(canvas);
 
+          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
           gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
           gl.clearColor(1, 1, 1, 1.0);
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -154,11 +282,142 @@
 
           });
 
-          requestAnimationFrame(shrink);
-          //requestAnimationFrame(moveCam);
-          //console.log('drawScene');
 
+          if (initialAnimation) {
+            requestAnimationFrame(shrink);
+          }
+
+          //console.log('drawscene');
         }
+
+        function renderPicking(e) {
+
+          //创建frame buffer
+          gl.bindTexture(gl.TEXTURE_2D, targetTexture);
+
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.canvas.width * 2, gl.canvas.height * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+          // 加入depth buffer（2/3）
+          gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+          gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.canvas.width * 2, gl.canvas.height * 2);
+
+          gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, targetTexture, 0);
+
+          // 加入depth buffer（3/3） 
+          gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
+
+          gl.bindTexture(gl.TEXTURE_2D, targetTexture);
+
+          // 创建mouse event对frustum matrix的转换通讯
+
+          const near = 1, far = 2000;
+          const top = Math.tan(degToRad(60) * 0.5) * near;
+          const bottom = -top;
+          const left = aspect * bottom;
+          const right = aspect * top;
+          const width = Math.abs(right - left);
+          const height = Math.abs(top - bottom);
+          const rect = canvas.getBoundingClientRect();
+
+          const pixelX = (e.clientX - rect.left) * gl.canvas.width / gl.canvas.clientWidth;
+          const pixelY = gl.canvas.height - (e.clientY - rect.top) * gl.canvas.height / gl.canvas.clientHeight - 1;
+
+          const subLeft = left + pixelX * width / gl.canvas.width;
+          const subBottom = bottom + pixelY * height / gl.canvas.height;
+          const subWidth = width / gl.canvas.width;
+          const subHeight = height / gl.canvas.height;
+
+          gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+          // Tell WebGL how to convert from clip space to pixels
+          gl.viewport(0, 0, 1, 1);
+
+          // Clear the canvas AND the depth buffer.
+          // gl.clear(gl.COLOR_BUFFER_BIT); //| gl.DEPTH_BUFFER_BIT
+
+          var projectionMatrix = m4.frustum(subLeft, subLeft + subWidth, subBottom, subBottom + subHeight, near, far);
+
+          var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
+
+          gl.useProgram(pickProgramInfo.program);
+
+          webglUtils.setBuffersAndAttributes(gl, pickProgramInfo, bufferInfo);
+
+          webglUtils.setUniforms(pickProgramInfo, pickUniforms);
+
+
+          // Draw objects
+          objects.forEach(function (object) {
+
+            let worldMatrix = m4.xRotation(0);
+            worldMatrix = m4.translate(worldMatrix, object.xTranslation, object.yTranslation, object.zTranslation);
+            worldMatrix = m4.yRotate(worldMatrix, object.yRotation);
+
+            // Multiply the matrices.
+            m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
+
+            // Set the uniforms we just computed
+            webglUtils.setUniforms(pickProgramInfo, uniformsThatAreComputedForEachObject);
+
+            webglUtils.setUniforms(pickProgramInfo, object.pickIDUniform);
+
+            // Draw the geometry.
+            gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+
+          });
+
+          //阅读物体id
+          const pixels = new Uint8Array(4);
+          gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+          
+          if (pixels[0] > 0) {
+            console.log('picked');
+
+            resizeCanvasToDisplaySize(canvas);
+
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+            gl.clearColor(0, 0, 1, 0.1);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+            const projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
+            const viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
+
+            gl.useProgram(programInfo.program);
+
+            // Setup all the needed buffers and attributes.
+            webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+
+            gl.disable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+            objects.forEach(function (object) {
+
+              let worldMatrix = m4.xRotation(0);
+              worldMatrix = m4.translate(worldMatrix, object.xTranslation, object.yTranslation +5, object.zTranslation);
+              worldMatrix = m4.yRotate(worldMatrix, object.yRotation);
+
+              // Multiply the matrices.
+              m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
+
+              // Set the uniforms we just computed
+              webglUtils.setUniforms(programInfo, uniformsThatAreComputedForEachObject);
+
+              // Draw the geometry.
+              gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+
+            });
+          } else {
+            drawScene();
+          }
+        }
+
 
         function drawObjects() {
 
@@ -173,6 +432,10 @@
                 yTranslation: 0,
                 zTranslation: (j - columnNum / 2) * (width + gapH) + gapH / 2,
 
+                pickIDUniform: {
+                  u_id: [(i + 1) / 255, (j + i) / 255, 0, 1],
+                }
+
               });
 
 
@@ -183,6 +446,10 @@
                 yTranslation: 0,
                 zTranslation: (j - columnNum / 2) * (width + gapH) + width + gapH / 2,
 
+                pickIDUniform: {
+                  u_id: [(i + 1) / 255, (j + i) / 255, 0, 1],
+                }
+
               });
 
               objects.push({
@@ -192,6 +459,10 @@
                 yTranslation: 0,
                 zTranslation: (j - columnNum / 2) * (width + gapH) + width / 2 + gapH / 2,
 
+                pickIDUniform: {
+                  u_id: [(i + 1) / 255, (j + i) / 255, 0, 1],
+                }
+
               });
 
               objects.push({
@@ -200,6 +471,10 @@
                 xTranslation: -(width + gapW) * (i - rowNum / 2) - gapW / 2,
                 yTranslation: 0,
                 zTranslation: (j - columnNum / 2) * (width + gapH) + width / 2 + gapH / 2,
+
+                pickIDUniform: {
+                  u_id: [(i + 1) / 255, (j + i) / 255, 0, 1],
+                }
 
               });
 
@@ -239,6 +514,8 @@
             requestAnimationFrame(drawScene);
             //console.log('shrink');
 
+          } else {
+            initialAnimation = false;
           }
 
         }
@@ -247,9 +524,7 @@
         drawScene();
 
         window.addEventListener('resize', drawScene, false);
-
-        //测试动画
-        window.addEventListener('click', shrink, false);
+        window.addEventListener('mousemove', renderPicking, false);
 
       }
 
