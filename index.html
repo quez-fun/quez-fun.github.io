@@ -134,8 +134,9 @@
     <script id="fragment-shader-3d" type="x-shader/x-fragment">
     precision highp float;
 
+    uniform vec4 u_colorMult;
     void main() {
-      gl_FragColor = vec4(0.05, 0.3,0.8, 0.55);
+      gl_FragColor = u_colorMult;//vec4(0.05, 0.3,0.8, 0.55);
     }
 </script>
     <script id="pick-vertex-shader-3d" type="x-shader/x-vertex">
@@ -187,9 +188,11 @@
       let objects = [];
       const uniformsThatAreComputedForEachObject = {
         u_worldViewProjection: m4.identity(),
+        //u_colorMult: [0.5,1,1,1],
       };
 
       let initialAnimation = true;
+      let objectPicked = 1;
 
       //create frame buffer
       const targetTexture = gl.createTexture();
@@ -276,12 +279,12 @@
 
             // Set the uniforms we just computed
             webglUtils.setUniforms(programInfo, uniformsThatAreComputedForEachObject);
+            webglUtils.setUniforms(programInfo, object.colorUniforms);
 
             // Draw the geometry.
             gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
 
           });
-
 
           if (initialAnimation) {
             requestAnimationFrame(shrink);
@@ -374,48 +377,28 @@
           const pixels = new Uint8Array(4);
           gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
-          
           if (pixels[0] > 0) {
-            console.log('picked');
+            //console.log(pixels);
 
-            resizeCanvasToDisplaySize(canvas);
+            objectPicked = (pixels[0]-1) * rowNum + pixels[1]; 
 
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-            gl.clearColor(0, 0, 1, 0.1);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            objects[(objectPicked-1) * 4].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+            objects[(objectPicked-1) * 4 + 1].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+            objects[(objectPicked-1) * 4 + 2].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+            objects[(objectPicked-1) * 4 + 3].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
 
-            const projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
-            const viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
-
-            gl.useProgram(programInfo.program);
-
-            // Setup all the needed buffers and attributes.
-            webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo);
-
-            gl.disable(gl.DEPTH_TEST);
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-            objects.forEach(function (object) {
-
-              let worldMatrix = m4.xRotation(0);
-              worldMatrix = m4.translate(worldMatrix, object.xTranslation, object.yTranslation +5, object.zTranslation);
-              worldMatrix = m4.yRotate(worldMatrix, object.yRotation);
-
-              // Multiply the matrices.
-              m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
-
-              // Set the uniforms we just computed
-              webglUtils.setUniforms(programInfo, uniformsThatAreComputedForEachObject);
-
-              // Draw the geometry.
-              gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
-
-            });
           } else {
-            drawScene();
+
+            objects[(objectPicked-1) * 4].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+            objects[(objectPicked-1) * 4 + 1].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+            objects[(objectPicked-1) * 4 + 2].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+            objects[(objectPicked-1) * 4 + 3].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+
           }
+
+
+
+          drawScene();
         }
 
 
@@ -433,7 +416,11 @@
                 zTranslation: (j - columnNum / 2) * (width + gapH) + gapH / 2,
 
                 pickIDUniform: {
-                  u_id: [(i + 1) / 255, (j + i) / 255, 0, 1],
+                  u_id: [(i + 1) / 255, (j + 1) / 255, 0, 1],
+                },
+
+                colorUniforms: {
+                  u_colorMult: [0.05, 0.3, 0.8, 0.55],
                 }
 
               });
@@ -447,7 +434,11 @@
                 zTranslation: (j - columnNum / 2) * (width + gapH) + width + gapH / 2,
 
                 pickIDUniform: {
-                  u_id: [(i + 1) / 255, (j + i) / 255, 0, 1],
+                  u_id: [(i + 1) / 255, (j + 1) / 255, 0, 1],
+                },
+
+                colorUniforms: {
+                  u_colorMult: [0.05, 0.3, 0.8, 0.55],
                 }
 
               });
@@ -460,7 +451,11 @@
                 zTranslation: (j - columnNum / 2) * (width + gapH) + width / 2 + gapH / 2,
 
                 pickIDUniform: {
-                  u_id: [(i + 1) / 255, (j + i) / 255, 0, 1],
+                  u_id: [(i + 1) / 255, (j + 1) / 255, 0, 1],
+                },
+
+                colorUniforms: {
+                  u_colorMult: [0.05, 0.3, 0.8, 0.55],
                 }
 
               });
@@ -473,7 +468,11 @@
                 zTranslation: (j - columnNum / 2) * (width + gapH) + width / 2 + gapH / 2,
 
                 pickIDUniform: {
-                  u_id: [(i + 1) / 255, (j + i) / 255, 0, 1],
+                  u_id: [(i + 1) / 255, (j + 1) / 255, 0, 1],
+                },
+
+                colorUniforms: {
+                  u_colorMult: [0.05, 0.3, 0.8, 0.55],
                 }
 
               });
