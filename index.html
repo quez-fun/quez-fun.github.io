@@ -7,7 +7,7 @@
     body {
       margin: 0 auto;
       font-family: Arial, Helvetica, sans-serif;
-      color: #777;
+      color: #444;
       overflow: hidden;
       width: auto;
       height: auto;
@@ -30,36 +30,32 @@
       width: 100%;
     }
 
-    span {
-      position: absolute;
-      color: aquamarine;
+    #title-area>p {
+      font-weight: 100;
     }
 
-
     .tag {
-      display: none;
       position: absolute;
       z-index: 99;
       top: 0;
       left: 0;
       width: 70px;
-    }
-
-    .tag>a {
       border: 1px solid #1d71b8;
       background-color: #fff;
       border-radius: 5px;
       color: #1d71b8;
-      display: block;
+
       font-size: 11px;
       line-height: 18px;
       margin: auto;
       padding: 5px;
       text-decoration: none;
       text-align: center;
+
+      display: none;
     }
 
-    .tag>a:before {
+    .tag:before {
       border: 11px solid transparent;
       border-bottom: 0;
       border-top: 11px solid #1d71b8;
@@ -68,11 +64,11 @@
       display: block;
       left: 50%;
       position: absolute;
-      transform: translate(-50%, 90%);
+      transform: translate(-50%, 100%);
       width: 0;
     }
 
-    .tag>a:after {
+    .tag:after {
       border: 10px solid transparent;
       border-bottom: 0;
       border-top: 10px solid #fff;
@@ -81,22 +77,19 @@
       display: block;
       left: 50%;
       position: absolute;
-      transform: translate(-50%, 85%);
+      transform: translate(-50%, 95%);
       width: 0;
     }
   </style>
 
   <body>
-
     <span class="tag">
-      <a href="">
-        test tag
-      </a>
+      test tag
     </span>
 
     <div id="title-area">
       <h4>My Projects</h4>
-      <p>temporary link<a href="https://quez-fun.github.io/gallery.html">(to be integrated soon)</a></p>
+      <p>move mouse over to view projects</p>
     </div>
     <canvas id="canvas"></canvas>
     <script id="vertex-shader-3d" type="x-shader/x-vertex">
@@ -145,6 +138,7 @@
       "use strict";
 
       const tag = document.getElementsByClassName('tag')[0];
+      //const tagContent = [];
 
       //canvas & context
       const canvas = document.querySelector("#canvas");
@@ -154,7 +148,7 @@
       //projection & view
       const fieldOfViewRadians = degToRad(60);
       const up = [0, 1, 0];
-      let cameraPosition = [120, 55, 120], targetPosition = [0, 0, 0];
+      let cameraPosition = [150, 60, 150], targetPosition = [0, 0, 0];
       let cameraMatrix = m4.lookAt(cameraPosition, targetPosition, up, m4.identity());
       let viewMatrix = m4.inverse(cameraMatrix);
 
@@ -353,10 +347,18 @@
 
           if (pixels[3] > 0) {
 
-            tag.style.display = 'block';
+            if (objectPicked == 9) {
+              tag.style.display = 'block';
 
-            tag.style.left = e.clientX - 35 + 'px';
-            tag.style.top = e.clientY - 50 + 'px';
+              tag.style.left = e.clientX - 35 + 'px';
+              tag.style.top = e.clientY - 50 + 'px';
+              tag.innerHTML = 'visit gallery';
+              window.addEventListener('mousedown', pageJump, false);
+            } else {
+              tag.style.display = 'none';
+              //tag.innerHTML = 'test tag';
+              window.removeEventListener('mousedown', pageJump, false);
+            }
 
             if (objectPicked !== (pixels[0] - 1) * rowNum + pixels[1]) {
 
@@ -377,9 +379,7 @@
             }
 
           } else {
-
             tag.style.display = 'none';
-
             objects[(objectPicked - 1) * 4].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
             objects[(objectPicked - 1) * 4 + 1].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
             objects[(objectPicked - 1) * 4 + 2].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
@@ -534,6 +534,9 @@
         return false;
       }
 
+      function pageJump() {
+        window.location.href = "https://quez-fun.github.io/gallery.html";
+      }
 
       main();
 
