@@ -30,93 +30,69 @@
       width: 100%;
     }
 
-    #btn {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 5%;
-    }
-
-    button {
-      background-color: white;
-      border: 1px solid black;
-      border-radius: 10px;
-      padding: 5px 8px;
-      margin: 8px;
-    }
-
-    a {
-      text-decoration: none;
-      color: blue;
-    }
-
-    /*
     span {
-    color: aquamarine;
-    font-weight: 300;
-}
+      position: absolute;
+      color: aquamarine;
+    }
 
 
     .tag {
-    position: absolute;
-    z-index: 99;
-    display: none;
-    top: 0;
-    left: 0;
-    width: 70px;
-  }
+      display: none;
+      position: absolute;
+      z-index: 99;
+      top: 0;
+      left: 0;
+      width: 70px;
+    }
 
-  a {
-    border: 1px solid #1d71b8;
-    background-color: #fff;
-    border-radius: 5px;
-    color: #1d71b8;
-    display: block;
-    font-size: 11px;
-    line-height: 18px;
-    margin: auto;
-    padding: 5px;
-    text-decoration: none;
-    text-align: center;
-  }
+    .tag>a {
+      border: 1px solid #1d71b8;
+      background-color: #fff;
+      border-radius: 5px;
+      color: #1d71b8;
+      display: block;
+      font-size: 11px;
+      line-height: 18px;
+      margin: auto;
+      padding: 5px;
+      text-decoration: none;
+      text-align: center;
+    }
 
-  a:before {
-    border: 11px solid transparent;
-    border-bottom: 0;
-    border-top: 11px solid #1d71b8;
-    bottom: 0;
-    content: "";
-    display: block;
-    left: 50%;
-    position: absolute;
-    transform: translate(-50%, 90%);
-    width: 0;
-  }
+    .tag>a:before {
+      border: 11px solid transparent;
+      border-bottom: 0;
+      border-top: 11px solid #1d71b8;
+      bottom: 0;
+      content: "";
+      display: block;
+      left: 50%;
+      position: absolute;
+      transform: translate(-50%, 90%);
+      width: 0;
+    }
 
-  a:after {
-    border: 10px solid transparent;
-    border-bottom: 0;
-    border-top: 10px solid #fff;
-    bottom: 0;
-    content: "";
-    display: block;
-    left: 50%;
-    position: absolute;
-    transform: translate(-50%, 85%);
-    width: 0;
-  }
-    */
+    .tag>a:after {
+      border: 10px solid transparent;
+      border-bottom: 0;
+      border-top: 10px solid #fff;
+      bottom: 0;
+      content: "";
+      display: block;
+      left: 50%;
+      position: absolute;
+      transform: translate(-50%, 85%);
+      width: 0;
+    }
   </style>
 
   <body>
 
-    <!--
-    
-        <span class="tag">
+    <span class="tag">
       <a href="">
         test tag
       </a>
-    </span>-->
+    </span>
 
     <div id="title-area">
       <h4>My Projects</h4>
@@ -124,42 +100,42 @@
     </div>
     <canvas id="canvas"></canvas>
     <script id="vertex-shader-3d" type="x-shader/x-vertex">
-    uniform mat4 u_worldViewProjection;
-    attribute vec4 a_position;
+        uniform mat4 u_worldViewProjection;
+        attribute vec4 a_position;
 
-    void main() {
-      gl_Position = u_worldViewProjection * a_position;
-    }
-</script>
+        void main() {
+          gl_Position = u_worldViewProjection * a_position;
+        }
+    </script>
     <script id="fragment-shader-3d" type="x-shader/x-fragment">
-    precision highp float;
+        precision highp float;
 
-    uniform vec4 u_colorMult;
-    void main() {
-      gl_FragColor = u_colorMult;//vec4(0.05, 0.3,0.8, 0.55);
-    }
-</script>
+        uniform vec4 u_colorMult;
+        void main() {
+          gl_FragColor = u_colorMult;//vec4(0.05, 0.3,0.8, 0.55);
+        }
+    </script>
     <script id="pick-vertex-shader-3d" type="x-shader/x-vertex">
-  uniform mat4 u_worldViewProjection;
-  
-  attribute vec4 a_position;
-  
-  void main() {
-    gl_Position = u_worldViewProjection * a_position;
-  }
-</script>
+        uniform mat4 u_worldViewProjection;
+        
+        attribute vec4 a_position;
+        
+        void main() {
+          gl_Position = u_worldViewProjection * a_position;
+        }
+    </script>
     <script id="pick-fragment-shader-3d" type="x-shader/x-fragment">
 
-  precision mediump float;
-  
-  uniform vec4 u_id;
-  
-  void main() {
-    gl_FragColor = u_id;
-    //gl_FragColor = vec4(1.0, 0.8, 0.0, 1.0);
-  }
+        precision mediump float;
+        
+        uniform vec4 u_id;
+        
+        void main() {
+          gl_FragColor = u_id;
+          //gl_FragColor = vec4(1.0, 0.8, 0.0, 1.0);
+        }
 
-</script>
+    </script>
 
     <script src="./webgl-utils.js"></script>
     <script src="./m4.js"></script>
@@ -167,6 +143,8 @@
     <script>
 
       "use strict";
+
+      const tag = document.getElementsByClassName('tag')[0];
 
       //canvas & context
       const canvas = document.querySelector("#canvas");
@@ -188,7 +166,6 @@
       let objects = [];
       const uniformsThatAreComputedForEachObject = {
         u_worldViewProjection: m4.identity(),
-        //u_colorMult: [0.5,1,1,1],
       };
 
       let initialAnimation = true;
@@ -295,7 +272,7 @@
 
         function renderPicking(e) {
 
-          //创建frame buffer
+          // setup frame buffer
           gl.bindTexture(gl.TEXTURE_2D, targetTexture);
 
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.canvas.width * 2, gl.canvas.height * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -304,19 +281,19 @@
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-          // 加入depth buffer（2/3）
+          // add depth buffer（2/3）
           gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
           gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.canvas.width * 2, gl.canvas.height * 2);
 
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
           gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, targetTexture, 0);
 
-          // 加入depth buffer（3/3） 
+          // add depth buffer（3/3） 
           gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
 
           gl.bindTexture(gl.TEXTURE_2D, targetTexture);
 
-          // 创建mouse event对frustum matrix的转换通讯
+          // mouse event to frustum matrix
 
           const near = 1, far = 2000;
           const top = Math.tan(degToRad(60) * 0.5) * near;
@@ -336,7 +313,6 @@
           const subHeight = height / gl.canvas.height;
 
           gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-          // Tell WebGL how to convert from clip space to pixels
           gl.viewport(0, 0, 1, 1);
 
           // Clear the canvas AND the depth buffer.
@@ -351,7 +327,6 @@
           webglUtils.setBuffersAndAttributes(gl, pickProgramInfo, bufferInfo);
 
           webglUtils.setUniforms(pickProgramInfo, pickUniforms);
-
 
           // Draw objects
           objects.forEach(function (object) {
@@ -373,32 +348,48 @@
 
           });
 
-          //阅读物体id
           const pixels = new Uint8Array(4);
           gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
-          if (pixels[0] > 0) {
-            //console.log(pixels);
+          if (pixels[3] > 0) {
 
-            objectPicked = (pixels[0]-1) * rowNum + pixels[1]; 
+            tag.style.display = 'block';
 
-            objects[(objectPicked-1) * 4].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
-            objects[(objectPicked-1) * 4 + 1].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
-            objects[(objectPicked-1) * 4 + 2].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
-            objects[(objectPicked-1) * 4 + 3].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+            tag.style.left = e.clientX - 35 + 'px';
+            tag.style.top = e.clientY - 50 + 'px';
+
+            if (objectPicked !== (pixels[0] - 1) * rowNum + pixels[1]) {
+
+              objects[(objectPicked - 1) * 4].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+              objects[(objectPicked - 1) * 4 + 1].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+              objects[(objectPicked - 1) * 4 + 2].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+              objects[(objectPicked - 1) * 4 + 3].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+
+              objectPicked = (pixels[0] - 1) * rowNum + pixels[1];
+
+              objects[(objectPicked - 1) * 4].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+              objects[(objectPicked - 1) * 4 + 1].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+              objects[(objectPicked - 1) * 4 + 2].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+              objects[(objectPicked - 1) * 4 + 3].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+
+              drawScene();
+
+            }
 
           } else {
 
-            objects[(objectPicked-1) * 4].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
-            objects[(objectPicked-1) * 4 + 1].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
-            objects[(objectPicked-1) * 4 + 2].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
-            objects[(objectPicked-1) * 4 + 3].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+            tag.style.display = 'none';
+
+            objects[(objectPicked - 1) * 4].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+            objects[(objectPicked - 1) * 4 + 1].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+            objects[(objectPicked - 1) * 4 + 2].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+            objects[(objectPicked - 1) * 4 + 3].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+
+            drawScene();
 
           }
 
 
-
-          drawScene();
         }
 
 
@@ -493,8 +484,6 @@
             for (var i = 0; i < rowNum; i++) {
 
               for (var j = 0; j < columnNum; j++) {
-                //for(var j = columnNum/2; j < columnNum; j++){
-                //apH *= -1;
 
                 objects[(j + columnNum * i) * 4].xTranslation = - (width + gapW) * (i - rowNum / 2) - width / 2 - gapW / 2;
                 objects[(j + columnNum * i) * 4 + 1].xTranslation = - (width + gapW) * (i - rowNum / 2) - width / 2 - gapW / 2;
@@ -515,15 +504,16 @@
 
           } else {
             initialAnimation = false;
+
+
+            window.addEventListener('resize', drawScene, false);
+            window.addEventListener('mousemove', renderPicking, false);
           }
 
         }
 
         drawObjects();
         drawScene();
-
-        window.addEventListener('resize', drawScene, false);
-        window.addEventListener('mousemove', renderPicking, false);
 
       }
 
@@ -546,6 +536,7 @@
 
 
       main();
+
 
     </script>
 
