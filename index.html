@@ -138,7 +138,18 @@
       "use strict";
 
       const tag = document.getElementsByClassName('tag')[0];
-      //const tagContent = [];
+      const tagContent = [
+        [], //0
+        [], //1
+        [], //2
+        [], //3
+        [], //4
+        [], //5
+        [], //6
+        ['solar', 'https://quez-fun.github.io/solar/'], //7
+        ['mini-pano', 'https://quez-fun.github.io/mini-panorama/'], //8
+        ['vist gallery', 'https://quez-fun.github.io/gallery.html'], //9
+      ];
 
       //canvas & context
       const canvas = document.querySelector("#canvas");
@@ -163,7 +174,7 @@
       };
 
       let initialAnimation = true;
-      let oldPickNdx = -1, isPicked = false;
+      let oldPickNdx = -1, pickNdx, isPicked = false;
 
       //create frame buffer
       const targetTexture = gl.createTexture();
@@ -347,14 +358,14 @@
 
           if (pixels[3] > 0) {
 
-            const pickNdx = (pixels[0] - 1) * rowNum + pixels[1];
+            pickNdx = (pixels[0] - 1) * rowNum + pixels[1];
 
-            if (pickNdx == 9) {
+            if (pickNdx == 9 | pickNdx == 8 | pickNdx == 7 ) {
               tag.style.display = 'block';
 
               tag.style.left = e.clientX - 35 + 'px';
               tag.style.top = e.clientY - 50 + 'px';
-              tag.innerHTML = 'visit gallery';
+              tag.innerHTML = tagContent[pickNdx][0];
 
               isPicked = true;
 
@@ -564,7 +575,9 @@
       function pageJump() {
 
         if (isPicked) {
-          window.location.href = "https://quez-fun.github.io/gallery.html";
+
+          window.location.href = tagContent[pickNdx][1];
+
         }
 
       }
