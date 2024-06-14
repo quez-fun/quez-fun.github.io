@@ -163,7 +163,7 @@
       };
 
       let initialAnimation = true;
-      let objectPicked = 1;
+      let oldPickNdx = -1;
 
       //create frame buffer
       const targetTexture = gl.createTexture();
@@ -345,50 +345,72 @@
           const pixels = new Uint8Array(4);
           gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
-          if (pixels[3] > 0) {
+          if (pixels[3] > 0) { 
 
-            if (objectPicked == 9) {
-              tag.style.display = 'block';
+            const pickNdx = (pixels[0] - 1) * rowNum + pixels[1]; 
 
-              tag.style.left = e.clientX - 35 + 'px';
-              tag.style.top = e.clientY - 50 + 'px';
-              tag.innerHTML = 'visit gallery';
-              window.addEventListener('mousedown', pageJump, false);
-            } else {
-              tag.style.display = 'none';
-              //tag.innerHTML = 'test tag';
-              window.removeEventListener('mousedown', pageJump, false);
-            }
+              if (pickNdx == 9) {
+                tag.style.display = 'block';
+  
+                tag.style.left = e.clientX - 35 + 'px';
+                tag.style.top = e.clientY - 50 + 'px';
+                tag.innerHTML = 'visit gallery';
+                window.addEventListener('mousedown', pageJump, false);
+              } else {
+                tag.style.display = 'none';
+                window.removeEventListener('mousedown', pageJump, false);
+              }
 
-            if (objectPicked !== (pixels[0] - 1) * rowNum + pixels[1]) {
+            if (oldPickNdx < 0) { 
 
-              objects[(objectPicked - 1) * 4].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
-              objects[(objectPicked - 1) * 4 + 1].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
-              objects[(objectPicked - 1) * 4 + 2].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
-              objects[(objectPicked - 1) * 4 + 3].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+              objects[(pickNdx - 1) * 4].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+              objects[(pickNdx - 1) * 4 + 1].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+              objects[(pickNdx - 1) * 4 + 2].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+              objects[(pickNdx - 1) * 4 + 3].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
 
-              objectPicked = (pixels[0] - 1) * rowNum + pixels[1];
-
-              objects[(objectPicked - 1) * 4].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
-              objects[(objectPicked - 1) * 4 + 1].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
-              objects[(objectPicked - 1) * 4 + 2].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
-              objects[(objectPicked - 1) * 4 + 3].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+              oldPickNdx = pickNdx;
 
               drawScene();
+
+            } else { 
+
+              if (oldPickNdx !== pickNdx) {
+
+                objects[(oldPickNdx - 1) * 4].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+                objects[(oldPickNdx - 1) * 4 + 1].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+                objects[(oldPickNdx - 1) * 4 + 2].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+                objects[(oldPickNdx - 1) * 4 + 3].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+
+                objects[(pickNdx - 1) * 4].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+                objects[(pickNdx - 1) * 4 + 1].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+                objects[(pickNdx - 1) * 4 + 2].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+                objects[(pickNdx - 1) * 4 + 3].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
+
+                oldPickNdx = pickNdx;
+
+                drawScene();
+
+              }
 
             }
 
           } else {
-            tag.style.display = 'none';
-            objects[(objectPicked - 1) * 4].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
-            objects[(objectPicked - 1) * 4 + 1].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
-            objects[(objectPicked - 1) * 4 + 2].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
-            objects[(objectPicked - 1) * 4 + 3].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
 
-            drawScene();
+            if (oldPickNdx > 0) {
+              objects[(oldPickNdx - 1) * 4].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+              objects[(oldPickNdx - 1) * 4 + 1].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+              objects[(oldPickNdx - 1) * 4 + 2].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+              objects[(oldPickNdx - 1) * 4 + 3].colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
+
+              drawScene();
+
+              oldPickNdx = -1;
+
+              tag.style.display = 'none';
+
+            }
 
           }
-
 
         }
 
