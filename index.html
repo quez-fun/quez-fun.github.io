@@ -163,7 +163,7 @@
       };
 
       let initialAnimation = true;
-      let oldPickNdx = -1;
+      let oldPickNdx = -1, isPicked = false;
 
       //create frame buffer
       const targetTexture = gl.createTexture();
@@ -345,23 +345,25 @@
           const pixels = new Uint8Array(4);
           gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
-          if (pixels[3] > 0) { 
+          if (pixels[3] > 0) {
 
-            const pickNdx = (pixels[0] - 1) * rowNum + pixels[1]; 
+            const pickNdx = (pixels[0] - 1) * rowNum + pixels[1];
 
-              if (pickNdx == 9) {
-                tag.style.display = 'block';
-  
-                tag.style.left = e.clientX - 35 + 'px';
-                tag.style.top = e.clientY - 50 + 'px';
-                tag.innerHTML = 'visit gallery';
-                window.addEventListener('mousedown', pageJump, false);
-              } else {
-                tag.style.display = 'none';
-                window.removeEventListener('mousedown', pageJump, false);
-              }
+            if (pickNdx == 9) {
+              tag.style.display = 'block';
 
-            if (oldPickNdx < 0) { 
+              tag.style.left = e.clientX - 35 + 'px';
+              tag.style.top = e.clientY - 50 + 'px';
+              tag.innerHTML = 'visit gallery';
+
+              isPicked = true;
+
+            } else {
+              tag.style.display = 'none';
+              isPicked = false;
+            }
+
+            if (oldPickNdx < 0) {
 
               objects[(pickNdx - 1) * 4].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
               objects[(pickNdx - 1) * 4 + 1].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
@@ -372,7 +374,7 @@
 
               drawScene();
 
-            } else { 
+            } else {
 
               if (oldPickNdx !== pickNdx) {
 
@@ -407,6 +409,7 @@
               oldPickNdx = -1;
 
               tag.style.display = 'none';
+              isPicked = false;
 
             }
 
@@ -530,6 +533,8 @@
 
             window.addEventListener('resize', drawScene, false);
             window.addEventListener('mousemove', renderPicking, false);
+
+            window.addEventListener('mousedown', pageJump, false);
           }
 
         }
@@ -557,7 +562,11 @@
       }
 
       function pageJump() {
-        window.location.href = "https://quez-fun.github.io/gallery.html";
+
+        if (isPicked) {
+          window.location.href = "https://quez-fun.github.io/gallery.html";
+        }
+
       }
 
       main();
