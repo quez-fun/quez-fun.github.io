@@ -149,6 +149,7 @@
         ['solar', 'https://quez-fun.github.io/solar/'], //7
         ['mini-pano', 'https://quez-fun.github.io/mini-panorama/'], //8
         ['vist gallery', 'https://quez-fun.github.io/gallery.html'], //9
+        ['exhibition booth', 'https://quez-fun.github.io/exhibition_booth.html'], //10
       ];
 
       //canvas & context
@@ -360,7 +361,7 @@
 
             pickNdx = (pixels[0] - 1) * rowNum + pixels[1];
 
-            if (pickNdx == 9 | pickNdx == 8 | pickNdx == 7 ) {
+            if (pickNdx == 9 | pickNdx == 8 | pickNdx == 7 | pickNdx == 10 ) {
               tag.style.display = 'block';
 
               tag.style.left = e.clientX - 35 + 'px';
