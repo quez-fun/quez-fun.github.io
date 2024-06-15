@@ -1,5 +1,5 @@
 <html>
-<title>工业展间案例</title>
+<title>Exhibition Booth</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <style>
@@ -42,7 +42,7 @@
 </style>
 
 <body>
-<div id="title">工业展间案例</div>
+<div id="title">Exhibition Booth</div>
 <div id="btn"></div>
 <canvas id="canvas"></canvas>
 <script  id="vertex-shader-3d" type="x-shader/x-vertex">
@@ -132,6 +132,8 @@ function main() {
 
   let camMov=[0,0,0], targetMov = [0,0,0];
   let tweenCount = 30;
+
+  let radius = 15;
 
   let isTweenReady = false, isTweening = false;
 
@@ -579,10 +581,11 @@ objects.push(object1, object2, object3);
     //console.log(e.deltaY);
     cameraPosition[0] = 0;
     cameraPosition[1] = 0;
-    cameraPosition[2] += e.deltaY;
-    //console.log(cameraPosition[2]);
-    cameraPosition[2] = Math.max(7, cameraPosition[2]);
-    cameraPosition[2] = Math.min(60, cameraPosition[2]);
+
+    radius += e.deltaY;
+    radius = Math.min(60, Math.max(1, radius));
+    //console.log(radius);
+    cameraPosition[2] = radius;
     target = [0,0,0];
     var cameraMatrix = m4.lookAt(cameraPosition, target, up, m4.identity());
         viewMatrix = m4.inverse(cameraMatrix);
@@ -616,9 +619,11 @@ objects.push(object1, object2, object3);
   }
   */
 
-  const radius = 15;
+
   let rad=0;
   function onMouseMove(e){
+
+    target = [0,0,0];
 
     x2 = e.clientX, y2 = e.clientY;
 
