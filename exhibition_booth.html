@@ -49,6 +49,9 @@
 
   <body>
 
+    <div>temporary mobile console area:<div id="tmpConsole"></div>
+  </div>
+
     <div id="title">Exhibition Booth</div>
     <div id="btn"></div>
     <canvas id="canvas"></canvas>
@@ -106,6 +109,8 @@
       "use strict";
 
       function main() {
+
+        const tmpConsole = document.getElementById("tmpConsole");
 
         let x1 = 0, x2 = 0, y1 = 0, y2 = 0, delta0, delta1;
 
@@ -658,6 +663,8 @@
               const deltaY = e.targetTouches[0].pageY - e.targetTouches[1].pageY;
               delta0 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
+              tmpConsole.innerText = delta0;
+
               break;
 
           }
@@ -710,6 +717,7 @@
                 radius -= (delta1-delta0);
                 radius = Math.min(60, Math.max(1, radius));
 
+                tmpConsole.innerText = radius;
                 cameraPosition[2] = radius;
                 target = [0, 0, 0];
                 var cameraMatrix = m4.lookAt(cameraPosition, target, up, m4.identity());
