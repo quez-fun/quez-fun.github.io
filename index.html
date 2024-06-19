@@ -83,6 +83,8 @@
   </style>
 
   <body>
+    <div>temporary mobile console area:<div id="tmpConsole"></div>
+    </div><!---->
     <span class="tag">
       test tag
     </span>
@@ -137,6 +139,8 @@
 
       "use strict";
 
+      const tmpConsole = document.getElementById("tmpConsole");
+
       const tag = document.getElementsByClassName('tag')[0];
       const tagContent = [
         [], //0
@@ -149,7 +153,7 @@
         ['solar', 'https://quez-fun.github.io/solar/'], //7
         ['mini-pano', 'https://quez-fun.github.io/mini-panorama/'], //8
         ['vist gallery', 'https://quez-fun.github.io/gallery.html'], //9
-        ['exhibition booth', 'https://quez-fun.github.io/exhibition_booth.html'], //10
+        ['booth', 'https://quez-fun.github.io/exhibition_booth.html'], //10
       ];
 
       //canvas & context
@@ -361,7 +365,7 @@
 
             pickNdx = (pixels[0] - 1) * rowNum + pixels[1];
 
-            if (pickNdx == 9 | pickNdx == 8 | pickNdx == 7 | pickNdx == 10 ) {
+            if (pickNdx == 9 | pickNdx == 8 | pickNdx == 7 | pickNdx == 10) {
               tag.style.display = 'block';
 
               tag.style.left = e.clientX - 35 + 'px';
@@ -425,6 +429,23 @@
 
             }
 
+          }
+
+        }
+
+        function pointerdown(e) {
+
+          if (e.pointerType === 'touch') {
+
+            if (!isPicked) {
+              renderPicking(e);
+            } else {
+              renderPicking(e);
+              pageJump();
+            }
+
+          } else {
+            pageJump();
           }
 
         }
@@ -537,16 +558,17 @@
             }
 
             requestAnimationFrame(drawScene);
-            //console.log('shrink');
+            tmpConsole.innerText = gapH;
 
           } else {
+
             initialAnimation = false;
 
+            canvas.addEventListener('pointerdown', pointerdown, false);
 
             window.addEventListener('resize', drawScene, false);
             window.addEventListener('mousemove', renderPicking, false);
 
-            window.addEventListener('mousedown', pageJump, false);
           }
 
         }
@@ -555,6 +577,8 @@
         drawScene();
 
       }
+
+
 
       function degToRad(d) {
         return d * Math.PI / 180;
@@ -582,6 +606,7 @@
         }
 
       }
+
 
       main();
 
