@@ -83,8 +83,8 @@
   </style>
 
   <body>
-    <div>temporary mobile console area:<div id="tmpConsole"></div>
-    </div><!---->
+    <!--<div>temporary mobile console area:<div id="tmpConsole"></div>
+    </div>-->
     <span class="tag">
       test tag
     </span>
@@ -139,7 +139,7 @@
 
       "use strict";
 
-      const tmpConsole = document.getElementById("tmpConsole");
+      //const tmpConsole = document.getElementById("tmpConsole");
 
       const tag = document.getElementsByClassName('tag')[0];
       const tagContent = [
@@ -180,6 +180,8 @@
 
       let initialAnimation = true;
       let oldPickNdx = -1, pickNdx, isPicked = false;
+
+      let y0, y1, delta0, delta1;
 
       //create frame buffer
       const targetTexture = gl.createTexture();
@@ -533,6 +535,134 @@
           //console.log(objects);
         }
 
+        function zoom(e) {
+
+          event.preventDefault();
+
+          const factor = e.deltaY * 0.1;
+
+          cameraPosition[0] += factor;
+
+          cameraPosition[1] -= factor * 2;
+
+          cameraPosition[1] = Math.min(400, Math.max(cameraPosition[1], 60));
+          cameraPosition[0] = Math.min(170, Math.max(cameraPosition[0], 0.1));
+
+          cameraPosition[2] = cameraPosition[0];
+
+          //tmpConsole.innerText = cameraPosition[1];
+
+          var cameraMatrix = m4.lookAt(cameraPosition, targetPosition, up, m4.identity());
+          viewMatrix = m4.inverse(cameraMatrix);
+
+          drawScene();
+        }
+
+        function touchstart(e) {
+
+          switch (e.targetTouches.length) {
+
+            case 1:
+
+              y0 = e.pageY;
+
+              break;
+
+            default:
+
+              /*
+                const deltaX = e.targetTouches[0].pageX - e.targetTouches[1].pageX;
+                const deltaY = e.targetTouches[0].pageY - e.targetTouches[1].pageY;
+                delta0 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+  
+                tmpConsole.innerText = delta0;
+                */
+
+              break;
+
+          }
+
+          window.addEventListener('touchmove', touchmove, false);
+          window.addEventListener('touchend', touchend, false);
+
+        }
+
+        function touchmove(e) {
+
+          e.preventDefault();
+
+          switch (e.targetTouches.length) {
+
+            case 1:
+
+              y1 = e.pageY;
+
+              const factor = (y1 - y0)/5;
+
+              cameraPosition[0] += factor;
+
+              cameraPosition[1] -= factor * 2;
+
+              cameraPosition[1] = Math.min(400, Math.max(cameraPosition[1], 60));
+              cameraPosition[0] = Math.min(170, Math.max(cameraPosition[0], 0.1));
+
+              cameraPosition[2] = cameraPosition[0];
+
+              //tmpConsole.innerText = cameraPosition[1];
+
+              var cameraMatrix = m4.lookAt(cameraPosition, targetPosition, up, m4.identity());
+              viewMatrix = m4.inverse(cameraMatrix);
+
+              drawScene();
+              y0 = y1;
+
+              break;
+
+            default:
+
+              /*
+                const deltaX = e.targetTouches[0].pageX - e.targetTouches[1].pageX;
+                const deltaY = e.targetTouches[0].pageY - e.targetTouches[1].pageY;
+    
+                if (!delta0) {
+                  delta0 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                } else {
+                  delta1 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+                  const factor = (delta1 - delta0);
+    
+                  cameraPosition[0] += factor;
+    
+                  cameraPosition[1] -= factor * 2;
+    
+                  cameraPosition[1] = Math.min(400, Math.max(cameraPosition[1], 60));
+                  cameraPosition[0] = Math.min(170, Math.max(cameraPosition[0], 0.1));
+    
+                  cameraPosition[2] = cameraPosition[0];
+    
+                  tmpConsole.innerText = cameraPosition[1];
+    
+                  var cameraMatrix = m4.lookAt(cameraPosition, targetPosition, up, m4.identity());
+                  viewMatrix = m4.inverse(cameraMatrix);
+    
+                  drawScene();
+                  delta0 = delta1;
+                }
+                  */
+              break;
+
+          }
+
+        }
+
+        function touchend() {
+          window.removeEventListener('touchmove', touchmove, false);
+          window.removeEventListener('touchend', touchend, false);
+        }
+
+
+
+
         function shrink() {
 
           if (gapH > 25) { //这个就是最终的位移值
@@ -558,7 +688,7 @@
             }
 
             requestAnimationFrame(drawScene);
-            tmpConsole.innerText = gapH;
+            //tmpConsole.innerText = gapH;
 
           } else {
 
@@ -569,12 +699,18 @@
             window.addEventListener('resize', drawScene, false);
             window.addEventListener('mousemove', renderPicking, false);
 
+            window.addEventListener('wheel', zoom, { passive: false });
+
+            window.addEventListener('touchstart', touchstart, false);
+
           }
 
         }
 
         drawObjects();
         drawScene();
+
+
 
       }
 
@@ -610,6 +746,7 @@
 
       main();
 
+      document.addEventListener('gesturestart', function (event) { event.preventDefault() }, false);
 
     </script>
 
