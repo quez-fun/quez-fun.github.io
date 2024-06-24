@@ -27,34 +27,44 @@
       top: 5%;
     }
 
-    #btn {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 5%;
-    }
 
-    button {
-      background-color: white;
-      border: 1px solid black;
-      border-radius: 10px;
-      padding: 5px 8px;
-      margin: 8px;
-    }
 
     a {
       text-decoration: none;
       color: blue;
     }
+
+    .progress-bar {
+      height: 24px;
+      width: 300px;
+      border: 1px solid black;
+      padding: 2px;
+      margin: 0 auto;
+      transform: translate(50%, 250px);
+      z-index: 9;
+      position: absolute;
+      text-align: center;
+      line-height: 50px;
+    }
+
+    .progress-fill {
+      background-color: blue;
+      height: 100%;
+    }
   </style>
 
   <body>
-<!--
+    <!--
     <div>temporary mobile console area:<div id="tmpConsole"></div>
   </div>-->
 
+
+
     <div id="title">Exhibition Booth</div>
-    <div id="btn"></div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 50%;"></div>
+      loading...
+    </div>
     <canvas id="canvas"></canvas>
     <script id="vertex-shader-3d" type="x-shader/x-vertex">
     uniform mat4 u_worldViewProjection;
@@ -117,7 +127,7 @@
 
         //内容区
 
-        const btn = document.getElementById("btn");
+        const loader = document.getElementsByClassName("progress-bar")[0];
         const title = document.getElementById("title");
         //const subtitles = ["<a href='./gallery-subscene-v2.html'>前往自动观赏模式</a>", "《秋光里的穿行》", "《通往仙境的道路》", "《西湖落日飞车》", "《镀金的西湖》", "《人在画中游》", "《西湖可以是任何一个湖》"];
 
@@ -192,6 +202,7 @@
             // If all the images are loaded call the callback.
             if (imagesToLoad === 0) {
               callback(images);
+              loader.style.display = 'none';
             }
           };
 
@@ -715,7 +726,7 @@
                 cameraPosition[0] = 0;
                 cameraPosition[1] = 0;
 
-                radius -= (delta1-delta0);
+                radius -= (delta1 - delta0);
                 radius = Math.min(60, Math.max(1, radius));
 
                 //tmpConsole.innerText = radius;
@@ -745,7 +756,6 @@
         }
 
 
-        btn.addEventListener('click', tweenRotate, false);
         //canvas.addEventListener('click', pick, false);
 
         window.addEventListener('resize', drawScene, false);
@@ -758,7 +768,7 @@
 
         window.addEventListener('touchstart', touchstart, false);
 
-        document.addEventListener('gesturestart', function(event){event.preventDefault()}, false);
+        document.addEventListener('gesturestart', function (event) { event.preventDefault() }, false);
 
       }
 
