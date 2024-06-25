@@ -1,0 +1,228 @@
+<html>
+    <title>Industrial Exhibition - A Composite Model</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: grey;
+            width: auto;
+            height: auto;
+        }
+
+        .header {
+            border-bottom: 1px solid grey;
+            color: black;
+            text-align: center;
+            padding: 30px 0;
+            font-weight: 100;
+        }
+        .header>span {
+            margin: 30px;
+        }
+        .header>span.active {
+            color: rgb(0, 145, 255);
+        }
+
+
+        .img {
+            width: 100%;
+            height: 450px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .wrapper{
+            perspective: 600px;
+            perspective-origin: center 250px;
+        }
+        .section {
+
+            transition: transform 2s, width 2s;
+
+        }
+
+
+        .building {
+            background-image: url("./img/building.jpeg");
+        }
+
+        .text {
+            background-color: ;
+        }
+
+
+        .intro>div {
+            margin: 100px;
+            
+        }
+        .subtitle>div {
+            margin: 50px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .office {
+            background-image: url("./img/office.jpeg");
+
+        }
+
+        .injection {
+            background-image: url("./img/workshop-injection.jpeg");
+            
+        }
+
+        .mold {
+            background-image: url("./img/workshop-mold.jpeg");
+        }
+
+        .PPT {
+            display: none;
+            text-align: center;
+            margin: 200px 0;
+            color: rgb(0, 145, 255)
+        }
+
+
+        /* booth
+
+        body {
+            overflow: hidden;
+        }
+
+        .intro {
+            border: 2px solid rgb(0, 145, 255);
+        }
+
+        .section-one {
+            
+            position: absolute;
+            transform: translate3d(-300px, -100px, -1000px) rotate3d(0, 1, 0, 60deg);
+            width: 600px;
+            height: 450px;
+        }
+
+        .section-two {
+            position: absolute;
+            transform: translate3d(300px, -300px, -2500px);
+            width: 600px;
+            height: 450px;
+        } */
+
+    </style>
+
+    <body>
+
+        <div class="header">
+            <span class="mode active">网页版</span>
+            <span class="mode ">展位版</span>
+            <span class="mode">PPT版</span>
+        </div>
+
+        <div class="wrapper">
+
+            <div class="section section-one">
+                <div class="img building"></div>
+                <div class="text intro">
+                    <div>
+                    宁波北仑伟煌（WEIHUANG）精密模塑有限公司始建于2013年5月，集高精模具设计与制造、产品开发为一体的企业，专业为客户提供一整套模具产品解决方案，是国内优秀的专业模具制造商之一。公司位于享有中国模具之乡美誉的宁波市北仑区，毗邻北仑港，交通便利。公司致力于家用电器、汽车部件，医疗产品等产品模具的设计开发，拥有强大的CAD/CAM/CAE专业模具设计团队，并先后聘请数位德国相关专家对我司的设计队伍、工程技术人员进行专业
+                    指导培训，促进我司在模具设计理念，加工工艺，模具精度方面有很 大的提升。<br><br>
+                    公司引进一流的加工设备和检测设备，配备专业的操作团队，确保模具制程的每个环节得到切实的受控，从而满足高效、高品质制作要求。<br><br>
+                    目前公司模具主要出口欧洲和日本，是德国凯驰 、 日本三洋的长期合作伙伴。
+                    </div>
+                </div>
+            </div>
+            <div class="section section-two">
+                <div class="img workshop office"></div>
+                <div class="text subtitle"><div>办公区域</div></div>
+
+                <div class="img workshop injection"></div>
+                <div class="text subtitle"><div>注塑车间</div></div>
+
+                <div class="img workshop mold"></div>
+                <div class="text subtitle"><div>模具车间</div></div>
+            </div>
+
+        </div>
+
+        <div class="PPT">功能开发中</div>
+    </body>
+
+
+    <script>
+
+        const section = document.getElementsByClassName("section");
+
+        const modeWeb = document.getElementsByClassName("mode")[0];
+        const modeBooth = document.getElementsByClassName("mode")[1];
+        const modePPT = document.getElementsByClassName("mode")[2];
+
+        const wrapper = document.getElementsByClassName("wrapper")[0];
+        const PPT = document.getElementsByClassName("PPT")[0];
+
+        const imgs = document.getElementsByClassName("img");
+        const texts = document.getElementsByClassName("text");
+
+        function switchToWeb() {
+            modeWeb.className += " active";
+            modeBooth.className = "mode";
+            modePPT.className = "mode";
+
+            wrapper.style.display = "block";
+            PPT.style.display = "none";
+
+            section[0].style.transform = "";
+            section[1].style.transform = "";
+
+            section[0].style.position = "";
+            section[1].style.position = "";
+
+            section[0].style.width = "100%";
+            section[1].style.width = "100%";
+
+            texts[0].style.border = "";
+        }
+
+        function switchToBooth() {
+            modeBooth.className += " active";
+            modeWeb.className = "mode";
+            modePPT.className = "mode";
+
+            wrapper.style.display = "block";
+            PPT.style.display = "none";
+
+            renderBooth();
+        }
+
+        function switchToPPT() {
+            modeBooth.className = "mode";
+            modeWeb.className = "mode";
+            modePPT.className += " active";
+
+            wrapper.style.display = "none";
+            PPT.style.display = "block";
+        }
+
+        function renderBooth() {
+            section[0].style.transform = "translate3d(-300px, -100px, -1000px) rotate3d(0, 1, 0, 60deg)";
+            section[1].style.transform = "translate3d(300px, -300px, -2500px)";
+
+            section[0].style.position = "absolute";
+            section[1].style.position = "absolute";
+
+            section[0].style.width = "600px";
+            section[1].style.width = "600px";
+
+            texts[0].style.border = "2px solid rgb(0, 145, 255)";
+        }
+
+
+        modeWeb.addEventListener('pointerdown', switchToWeb, false);
+        modeBooth.addEventListener('pointerdown', switchToBooth, false);
+        modePPT.addEventListener('pointerdown', switchToPPT, false);
+
+    </script>
+
+</html>
