@@ -17,10 +17,14 @@
             text-align: center;
             padding: 30px 0;
             font-weight: 100;
+
+            display: none;
         }
+
         .header>span {
             margin: 30px;
         }
+
         .header>span.active {
             color: rgb(0, 145, 255);
         }
@@ -34,19 +38,18 @@
             background-size: cover;
         }
 
-        .wrapper{
-            perspective: 600px;
-            perspective-origin: center 250px;
-        }
         .section {
 
-            transition: transform 2s, width 2s;
+            /*transition: transform 2s, width 2s;*/
+            display: flex;
 
         }
 
 
         .building {
             background-image: url("./img/building.jpeg");
+            width: 50%;
+            height: 100%;
         }
 
         .text {
@@ -54,10 +57,7 @@
         }
 
 
-        .intro>div {
-            margin: 100px;
-            
-        }
+
         .subtitle>div {
             margin: 50px;
             font-size: 20px;
@@ -71,7 +71,7 @@
 
         .injection {
             background-image: url("./img/workshop-injection.jpeg");
-            
+
         }
 
         .mold {
@@ -86,68 +86,124 @@
         }
 
 
-        /* booth
+        /* booth */
 
         body {
-            overflow: hidden;
+            overflow: ;
         }
 
         .intro {
             border: 2px solid rgb(0, 145, 255);
+            width: 50%;
+            height: 100%;
         }
 
+        .intro>div {
+            margin: 50px 30px;
+        }
+
+        .wrapper {}
+
         .section-one {
-            
+
             position: absolute;
-            transform: translate3d(-300px, -100px, -1000px) rotate3d(0, 1, 0, 60deg);
-            width: 600px;
-            height: 450px;
+            transform: perspective(600px) translate3d(-400px, 00px, -1000px) rotate3d(0, 1, 0, 90deg);
+            width: 800px;
+            height: 500px;
+
         }
 
         .section-two {
             position: absolute;
-            transform: translate3d(300px, -300px, -2500px);
-            width: 600px;
-            height: 450px;
-        } */
+            transform: perspective(800px) translate3d(00px, 0px, 00px);
+            width: 800px;
+            height: 500px;
+
+            background-color: #eee;
+        }
+
+        .section-three {
+            position: absolute;
+            transform: perspective(800px) translate3d(400px, 00px, -1000px) rotate3d(0, 1, 0, -90deg);
+            width: 800px;
+            height: 500px;
+
+            background-color: skyblue;
+
+        }
+
+        .plane {
+
+            display: none;
+            position: absolute;
+            width: 800px;
+            height: 500px;
+            background-color: red;
+            transform: rotateX(calc(var(--rotate-x, -24) * 1deg)) rotateY(calc(var(--rotate-y, -24) * 1deg)) rotateX(90deg) translate3d(0, 0, 0);
+        }
+
+        .console {
+            /*position: absolute;*/
+            opacity: 0.5;
+        }
+
 
     </style>
 
     <body>
 
+        <div class="console">console area</div>
+
         <div class="header">
-            <span class="mode active">网页版</span>
-            <span class="mode ">展位版</span>
+            <span class="mode">网页版</span>
+            <span class="mode active">展位版</span>
             <span class="mode">PPT版</span>
         </div>
 
         <div class="wrapper">
 
+            <div class="plane"></div>
             <div class="section section-one">
+                <!---->
                 <div class="img building"></div>
                 <div class="text intro">
                     <div>
-                    宁波北仑伟煌（WEIHUANG）精密模塑有限公司始建于2013年5月，集高精模具设计与制造、产品开发为一体的企业，专业为客户提供一整套模具产品解决方案，是国内优秀的专业模具制造商之一。公司位于享有中国模具之乡美誉的宁波市北仑区，毗邻北仑港，交通便利。公司致力于家用电器、汽车部件，医疗产品等产品模具的设计开发，拥有强大的CAD/CAM/CAE专业模具设计团队，并先后聘请数位德国相关专家对我司的设计队伍、工程技术人员进行专业
-                    指导培训，促进我司在模具设计理念，加工工艺，模具精度方面有很 大的提升。<br><br>
-                    公司引进一流的加工设备和检测设备，配备专业的操作团队，确保模具制程的每个环节得到切实的受控，从而满足高效、高品质制作要求。<br><br>
-                    目前公司模具主要出口欧洲和日本，是德国凯驰 、 日本三洋的长期合作伙伴。
+                        宁波北仑伟煌（WEIHUANG）精密模塑有限公司始建于2013年5月，集高精模具设计与制造、产品开发为一体的企业，专业为客户提供一整套模具产品解决方案，是国内优秀的专业模具制造商之一。公司位于享有中国模具之乡美誉的宁波市北仑区，毗邻北仑港，交通便利。公司致力于家用电器、汽车部件，医疗产品等产品模具的设计开发，拥有强大的CAD/CAM/CAE专业模具设计团队，并先后聘请数位德国相关专家对我司的设计队伍、工程技术人员进行专业
+                        指导培训，促进我司在模具设计理念，加工工艺，模具精度方面有很 大的提升。<br><br>
+                        公司引进一流的加工设备和检测设备，配备专业的操作团队，确保模具制程的每个环节得到切实的受控，从而满足高效、高品质制作要求。<br><br>
+                        目前公司模具主要出口欧洲和日本，是德国凯驰 、 日本三洋的长期合作伙伴。
                     </div>
                 </div>
+
             </div>
             <div class="section section-two">
+                <!---->
                 <div class="img workshop office"></div>
-                <div class="text subtitle"><div>办公区域</div></div>
+                <div class="text subtitle">
+                    <div>办公区域</div>
+                </div>
 
                 <div class="img workshop injection"></div>
-                <div class="text subtitle"><div>注塑车间</div></div>
+                <div class="text subtitle">
+                    <div>注塑车间</div>
+                </div>
 
                 <div class="img workshop mold"></div>
-                <div class="text subtitle"><div>模具车间</div></div>
+                <div class="text subtitle">
+                    <div>模具车间</div>
+                </div>
+
+
             </div>
 
-        </div>
+            <div class="section section-three">
+                <div class="img "></div>
+                <div class="text subtitle">
+                    <div>服务流程</div>
+                </div>
+            </div>
 
-        <div class="PPT">功能开发中</div>
+            <div class="PPT">功能开发中</div>
     </body>
 
 
@@ -218,10 +274,25 @@
             texts[0].style.border = "2px solid rgb(0, 145, 255)";
         }
 
+        function onResize() {
+
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            document.getElementsByClassName("console")[0].innerHTML =
+                'width: ' + width + '<br>height: ' + height;
+
+            section[0].style.transform = 'perspective(800px) translate3d(' + ( width - 1600)/2 + 'px, 0px, -800px) rotate3d(0, 1, 0, 90deg)';
+            section[1].style.transform = 'perspective(800px) translate3d(' + ( width - 800 )/2 + 'px, 0px, -1200px)';
+            section[2].style.transform = 'perspective(800px) translate3d(' + ( width - 0)/2 + 'px, 0px, -800px) rotate3d(0, 1, 0, -90deg)'
+        }
+
+        onResize();
 
         modeWeb.addEventListener('pointerdown', switchToWeb, false);
         modeBooth.addEventListener('pointerdown', switchToBooth, false);
         modePPT.addEventListener('pointerdown', switchToPPT, false);
+
+        window.addEventListener('resize', onResize, false);
 
     </script>
 
