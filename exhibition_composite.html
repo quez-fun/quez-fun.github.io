@@ -32,7 +32,7 @@
 
         .img {
             width: 100%;
-            height: 450px;
+            height: auto;
             background-position: center center;
             background-repeat: no-repeat;
             background-size: cover;
@@ -42,40 +42,43 @@
 
             /*transition: transform 2s, width 2s;*/
             display: flex;
-
+            opacity: 0.5;
         }
 
 
         .building {
             background-image: url("./img/building.jpeg");
+            background-color: gray;
             width: 50%;
             height: 100%;
         }
 
         .text {
             background-color: ;
+
         }
 
 
 
         .subtitle>div {
-            margin: 50px;
+            margin: 10px;
             font-size: 20px;
             text-align: center;
         }
 
         .office {
             background-image: url("./img/office.jpeg");
-
+            background-color: gray;
         }
 
         .injection {
             background-image: url("./img/workshop-injection.jpeg");
-
+            background-color: gray;
         }
 
         .mold {
             background-image: url("./img/workshop-mold.jpeg");
+            background-color: gray;
         }
 
         .PPT {
@@ -96,13 +99,17 @@
             border: 2px solid rgb(0, 145, 255);
             width: 50%;
             height: 100%;
+            overflow: scroll;
         }
 
         .intro>div {
             margin: 50px 30px;
         }
 
-        .wrapper {}
+        .wrapper {
+            perspective: 800px;
+            perspective-origin: center 250px;
+        }
 
         .section-one {
 
@@ -132,6 +139,10 @@
 
         }
 
+        .subtitle {
+            width: 20%;
+        }
+
         .plane {
 
             display: none;
@@ -143,7 +154,7 @@
         }
 
         .console {
-            /*position: absolute;*/
+            position: absolute;
             opacity: 0.5;
         }
 
@@ -281,9 +292,21 @@
             document.getElementsByClassName("console")[0].innerHTML =
                 'width: ' + width + '<br>height: ' + height;
 
-            section[0].style.transform = 'perspective(800px) translate3d(' + ( width - 1600)/2 + 'px, 0px, -800px) rotate3d(0, 1, 0, 90deg)';
-            section[1].style.transform = 'perspective(800px) translate3d(' + ( width - 800 )/2 + 'px, 0px, -1200px)';
-            section[2].style.transform = 'perspective(800px) translate3d(' + ( width - 0)/2 + 'px, 0px, -800px) rotate3d(0, 1, 0, -90deg)'
+            const boardWidth = width;
+            const boardHeight = width * 5/8;
+
+            section[0].style.width = boardWidth;
+            section[0].style.height = boardHeight;
+
+            section[1].style.width = boardWidth;
+            section[1].style.height = boardHeight;
+
+            section[2].style.width = boardWidth;
+            section[2].style.height = boardHeight;
+
+            section[0].style.transform = 'translate3d(' + ( width - boardWidth * 2)/2 + 'px, '+ (height - boardHeight)/2 + 'px, -' + boardWidth * 0.8 + 'px) rotate3d(0, 1, 0, 90deg)';
+            section[1].style.transform = 'translate3d(' + ( width - boardWidth )/2 + 'px, '+ (height - boardHeight)/2 + 'px, -' + boardWidth * 1.3 + 'px)';
+            section[2].style.transform = 'translate3d(' + ( width - 0)/2 + 'px, ' + (height - boardHeight)/2  + 'px, -' + boardWidth * 0.8 + 'px) rotate3d(0, 1, 0, -90deg)'
         }
 
         onResize();
