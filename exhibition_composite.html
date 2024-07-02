@@ -108,7 +108,7 @@
 
         .wrapper {
             perspective: 800px;
-            perspective-origin: center 250px;
+            perspective-origin: center;
         }
 
         .section-one {
@@ -304,9 +304,23 @@
             section[2].style.width = boardWidth;
             section[2].style.height = boardHeight;
 
-            section[0].style.transform = 'translate3d(' + ( width - boardWidth * 2)/2 + 'px, '+ (height - boardHeight)/2 + 'px, -' + boardWidth * 0.8 + 'px) rotate3d(0, 1, 0, 90deg)';
-            section[1].style.transform = 'translate3d(' + ( width - boardWidth )/2 + 'px, '+ (height - boardHeight)/2 + 'px, -' + boardWidth * 1.3 + 'px)';
-            section[2].style.transform = 'translate3d(' + ( width - 0)/2 + 'px, ' + (height - boardHeight)/2  + 'px, -' + boardWidth * 0.8 + 'px) rotate3d(0, 1, 0, -90deg)'
+            section[0].style.transform = 'translate3d(' + 
+                ( width - boardWidth * 2)/2 + 'px, '+ 
+                (height - boardHeight)/2 + 'px, -' + 
+                boardWidth * 0.8 + 'px) rotate3d(0, 1, 0, 90deg)';
+
+            section[1].style.transform = 'translate3d(' + 
+                ( width - boardWidth )/2 + 'px, '+ 
+                (height - boardHeight )/2  + 'px, -' + 
+                //boardWidth * 0 + 'px)';
+                boardWidth * 1.3 + 'px)';
+
+            section[2].style.transform = 'translate3d(' + 
+                ( width - 0)/2 + 'px, ' + 
+                (height - boardHeight)/2  + 'px, -' + 
+                boardWidth * 0.8 + 'px) rotate3d(0, 1, 0, -90deg)'
+
+            section[0].parentElement.style.perspectiveOrigin = 'center ' + height/2 + 'px';
         }
 
         onResize();
