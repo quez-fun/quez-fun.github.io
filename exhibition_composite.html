@@ -110,25 +110,26 @@
         }
 
         .wrapper {
-            perspective: 800px;
+            perspective: 1200px;
             perspective-origin: center;
         }
 
         .section-one {
-
             position: absolute;
-            background-color: #white;
+            background-color: white;
+            z-index: 2;
         }
 
         .section-two {
             position: absolute;
             background-color: #eee;
+            z-index: 1;
         }
 
         .section-three {
             position: absolute;
-
             background-color: skyblue;
+            z-index: 2;
         }
 
         .subtitle {
@@ -147,6 +148,7 @@
 
         .console {
             position: absolute;
+            z-index: 99;
         }
     </style>
 
@@ -163,6 +165,20 @@
         <div class="wrapper">
 
             <div class="plane"></div>
+
+            <div class="section section-one">
+                <!---->
+                <div class="img building"></div>
+                <div class="text intro">
+                    <div>
+                        宁波北仑伟煌（WEIHUANG）精密模塑有限公司始建于2013年5月，集高精模具设计与制造、产品开发为一体的企业，专业为客户提供一整套模具产品解决方案，是国内优秀的专业模具制造商之一。公司位于享有中国模具之乡美誉的宁波市北仑区，毗邻北仑港，交通便利。公司致力于家用电器、汽车部件，医疗产品等产品模具的设计开发，拥有强大的CAD/CAM/CAE专业模具设计团队，并先后聘请数位德国相关专家对我司的设计队伍、工程技术人员进行专业
+                        指导培训，促进我司在模具设计理念，加工工艺，模具精度方面有很 大的提升。<br><br>
+                        公司引进一流的加工设备和检测设备，配备专业的操作团队，确保模具制程的每个环节得到切实的受控，从而满足高效、高品质制作要求。<br><br>
+                        目前公司模具主要出口欧洲和日本，是德国凯驰 、 日本三洋的长期合作伙伴。
+                    </div>
+                </div>
+
+            </div>
 
             <div class="section section-two">
                 <!---->
@@ -183,20 +199,6 @@
 
 
             </div>
-            <div class="section section-one">
-                <!---->
-                <div class="img building"></div>
-                <div class="text intro">
-                    <div>
-                        宁波北仑伟煌（WEIHUANG）精密模塑有限公司始建于2013年5月，集高精模具设计与制造、产品开发为一体的企业，专业为客户提供一整套模具产品解决方案，是国内优秀的专业模具制造商之一。公司位于享有中国模具之乡美誉的宁波市北仑区，毗邻北仑港，交通便利。公司致力于家用电器、汽车部件，医疗产品等产品模具的设计开发，拥有强大的CAD/CAM/CAE专业模具设计团队，并先后聘请数位德国相关专家对我司的设计队伍、工程技术人员进行专业
-                        指导培训，促进我司在模具设计理念，加工工艺，模具精度方面有很 大的提升。<br><br>
-                        公司引进一流的加工设备和检测设备，配备专业的操作团队，确保模具制程的每个环节得到切实的受控，从而满足高效、高品质制作要求。<br><br>
-                        目前公司模具主要出口欧洲和日本，是德国凯驰 、 日本三洋的长期合作伙伴。
-                    </div>
-                </div>
-
-            </div>
-
 
             <div class="section section-three">
                 <div class="img "></div>
@@ -284,14 +286,18 @@
             texts[0].style.border = "2px solid rgb(0, 145, 255)";
         }
 
-        let t01, t02, t03, t11, t12, t13, t21, t22, t23;
+        let adjustY, adjustZ;
 
         function onResize() {
 
             const width = window.innerWidth;
             const height = window.innerHeight;
+
+            section[0].parentElement.style.perspective = width * 2 + 'px';
+
             document.getElementsByClassName("console")[0].innerHTML =
-                'width: ' + width + '<br>height: ' + height;
+            section[0].parentElement.style.perspective;
+//                'width: ' + width + '<br>height: ' + height;
 
             const boardWidth = width;
             const boardHeight = width * 5 / 8;
@@ -310,31 +316,13 @@
             section[0].style.transformOrigin = `center center ${boardWidth * 0.5}px`;
             section[1].style.transformOrigin = `center center ${boardWidth * 0.5}px`;
             section[2].style.transformOrigin = `center center ${boardWidth * 0.5}px`;
-            //section[1].style.transformOrigin = `center center center`;
 
-            t01 = 0;// (width - boardWidth * 2) / 2;
-            t02 = (height - boardHeight) / 2;
-            t03 = -boardWidth * 0.8;
+            adjustY = (height - boardHeight) / 2;
+            adjustZ = -boardWidth * 0.8;
 
-            t11 = 0;// (width - boardWidth ) / 2;
-            t12 = (height - boardHeight) / 2;
-            t13 = -boardWidth * 1.3;
 
-            t21 = 0;//width / 2;
-            t22 = (height - boardHeight) / 2;
-            t23 = -boardWidth * 0.8;
 
-            //section[0].style.transform = `translate3d(${(width - boardWidth * 2) / 2 }px, ${(height - boardHeight) / 2 }px, -${boardWidth * 0.8 }px) `;
-            section[0].style.transform = `translate3d(${t01}px, ${t02}px, ${t03}px) `;
-            section[0].style.transform += `rotate3d(0, 1, 0, ${(rotation + 90)}deg)`;
-
-            //section[1].style.transform = `translate3d(${(width - boardWidth ) / 2 }px, ${(height - boardHeight) / 2 }px, -${boardWidth * 1.3 }px) `;
-            section[1].style.transform = `translate3d(${t11}px, ${t12}px, ${t13}px) `;
-            section[1].style.transform += `rotate3d(0, 1, 0, ${rotation}deg)`;
-
-            //section[2].style.transform = `translate3d(${width / 2 }px, ${(height - boardHeight) / 2 }px, -${boardWidth * 0.8 }px) `;
-            section[2].style.transform = `translate3d(${t21}px, ${t22}px, ${t23}px) `;
-            section[2].style.transform += `rotate3d(0, 1, 0, ${(rotation - 90)}deg)`;
+            renderCSS();
 
         }
 
@@ -350,23 +338,43 @@
             x2 = e.clientX, y2 = e.clientY;
 
             rotation += (x2 - x1) / 10;
-            //rotation = Math.min(45, Math.max(-45, rotation));
+            rotation %=360;
+            
+            if (rotation > -12.5 ) {
+                section[1].style.zIndex = "3";
+                section[0].style.zIndex = "1";
 
-            //section[0].style.transform = transformValue.slice(0,-6) + (rotation+90) + 'deg)';
-            section[0].style.transform = `translate3d(${t01}px, ${t02}px, ${t03}px) `;
-            section[0].style.transform += 'rotate3d(0,1,0,' + (rotation + 90) + 'deg)';
+            } else {
+                section[1].style.zIndex = "1";
+            }
+            
+            if(rotation < -77.5) {
+                section[2].style.zIndex = "1";
+                section[1].style.zIndex = "3";
+            }
+            //else if (rotation < - 90) {
+                //section[1].style.zIndex = "2";
+                //section[2].style.zIndex = "2";
+            //}
+            
+            document.getElementsByClassName('console')[0].innerText = rotation + 90;
 
-            section[1].style.transform = `translate3d(${t11}px, ${t12}px, ${t13}px) `;
-            section[1].style.transform += 'rotate3d(0,1,0,' + (rotation) + 'deg)';
-
-            section[2].style.transform = `translate3d(${t21}px, ${t22}px, ${t23}px) `;
-            section[2].style.transform += 'rotate3d(0,1,0,' + (rotation - 90) + 'deg)';
-            //section[1].style.transform += 'rotateY(' + (rotation+90) + 'deg)';
-            //section[2].style.transform += 'rotateY(' + (rotation-90) + 'deg)';
+            renderCSS();
 
             x1 = x2;
             y1 = y2;
 
+        }
+
+        function renderCSS(){
+            section[0].style.transform = `translate3d(0px, ${adjustY}px, ${adjustZ}px) `;
+            section[0].style.transform += `rotate3d(0, 1, 0, ${(rotation + 90)}deg)`;
+
+            section[1].style.transform = `translate3d(0px, ${adjustY}px, ${adjustZ}px) `;
+            section[1].style.transform += `rotate3d(0, 1, 0, ${rotation}deg)`;
+
+            section[2].style.transform = `translate3d(0px, ${adjustY}px, ${adjustZ}px) `;
+            section[2].style.transform += `rotate3d(0, 1, 0, ${(rotation - 90)}deg)`;
         }
 
         function onMouseUp() {
@@ -381,7 +389,7 @@
         function onMouseWheel(e) {
             e.preventDefault();
             distance -= e.deltaY;
-            distance = Math.max(-3000, Math.min(0, distance));
+            //distance = Math.max(-3000, Math.min(0, distance));
             section[0].parentElement.style.transform = 'translateZ(' + distance + 'px)';
         }
 
@@ -434,7 +442,7 @@
 
                     section[1].style.transform = `translate3d(${t11}px, ${t12}px, ${t13}px) `;
                     section[1].style.transform += 'rotate3d(0,1,0,' + (rotation) + 'deg)';
-
+  
                     section[2].style.transform = `translate3d(${t21}px, ${t22}px, ${t23}px) `;
                     section[2].style.transform += 'rotate3d(0,1,0,' + (rotation - 90) + 'deg)';
 
