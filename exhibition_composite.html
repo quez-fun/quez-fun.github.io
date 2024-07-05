@@ -117,19 +117,22 @@
         .section-one {
             position: absolute;
             background-color: white;
-            z-index: 2;
+
+            z-index: 3;
         }
 
         .section-two {
             position: absolute;
             background-color: #eee;
-            z-index: 1;
+
+            z-index: 2;
         }
 
         .section-three {
             position: absolute;
             background-color: skyblue;
-            z-index: 2;
+
+            z-index: 1;
         }
 
         .subtitle {
@@ -296,8 +299,8 @@
             section[0].parentElement.style.perspective = width * 2 + 'px';
 
             document.getElementsByClassName("console")[0].innerHTML =
-            section[0].parentElement.style.perspective;
-//                'width: ' + width + '<br>height: ' + height;
+                section[0].parentElement.style.perspective;
+            //                'width: ' + width + '<br>height: ' + height;
 
             const boardWidth = width;
             const boardHeight = width * 5 / 8;
@@ -338,26 +341,62 @@
             x2 = e.clientX, y2 = e.clientY;
 
             rotation += (x2 - x1) / 10;
-            rotation %=360;
-            
+            rotation %= 360;
+
+            document.getElementsByClassName('console')[0].innerText = rotation;
+            /*
             if (rotation > -12.5 ) {
                 section[1].style.zIndex = "3";
                 section[0].style.zIndex = "1";
 
             } else {
                 section[1].style.zIndex = "1";
+            } */
+
+
+            if (rotation < -12.5) {
+
+                section[2].style.zIndex = "3";
+                section[1].style.zIndex = "2";
+                section[0].style.zIndex = "1";
+
+                if (rotation < -102.5) {
+                    //console.log('change');
+                    section[2].style.zIndex = "2";
+                    section[1].style.zIndex = "3";
+                    section[0].style.zIndex = "1";
+
+                    if (rotation < -192.5) {
+                        section[2].style.zIndex = "1";
+                        section[1].style.zIndex = "2";
+                        section[0].style.zIndex = "3";
+                    }
+                }
             }
-            
-            if(rotation < -77.5) {
+            else if (rotation > 12.5) {
+
+                section[0].style.zIndex = "3";
+                section[1].style.zIndex = "2";
                 section[2].style.zIndex = "1";
-                section[1].style.zIndex = "3";
+
+                if (rotation > 167.5) {
+
+                    section[0].style.zIndex = "1";
+                    section[1].style.zIndex = "3";
+                    section[2].style.zIndex = "2";
+
+                    if (rotation > 257.5) {
+                        section[0].style.zIndex = "1";
+                        section[1].style.zIndex = "2";
+                        section[2].style.zIndex = "3";
+                    }
+                }
             }
-            //else if (rotation < - 90) {
-                //section[1].style.zIndex = "2";
-                //section[2].style.zIndex = "2";
-            //}
-            
-            document.getElementsByClassName('console')[0].innerText = rotation + 90;
+
+
+
+
+
 
             renderCSS();
 
@@ -366,7 +405,7 @@
 
         }
 
-        function renderCSS(){
+        function renderCSS() {
             section[0].style.transform = `translate3d(0px, ${adjustY}px, ${adjustZ}px) `;
             section[0].style.transform += `rotate3d(0, 1, 0, ${(rotation + 90)}deg)`;
 
@@ -442,7 +481,7 @@
 
                     section[1].style.transform = `translate3d(${t11}px, ${t12}px, ${t13}px) `;
                     section[1].style.transform += 'rotate3d(0,1,0,' + (rotation) + 'deg)';
-  
+
                     section[2].style.transform = `translate3d(${t21}px, ${t22}px, ${t23}px) `;
                     section[2].style.transform += 'rotate3d(0,1,0,' + (rotation - 90) + 'deg)';
 
