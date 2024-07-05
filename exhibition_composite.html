@@ -44,8 +44,9 @@
 
         .section {
 
-            /*transition: transform 2s, width 2s;*/
+            /*transition: transform 2s, opacity 2s;*/
             display: flex;
+
         }
 
 
@@ -233,7 +234,9 @@
         let distance = 0;
         let rotation = 0;
 
-        let x1, x2, y1, y2;
+        let isInside
+
+        let x1, x2;
         let delta0, delta1;
 
         function switchToWeb() {
@@ -324,7 +327,6 @@
             adjustZ = -boardWidth * 0.8;
 
 
-
             renderCSS();
 
         }
@@ -333,76 +335,18 @@
 
             window.addEventListener('mousemove', onMouseMove, false);
 
-            x1 = e.clientX, y1 = e.clientY;
+            x1 = e.clientX;
 
         }
         function onMouseMove(e) {
 
-            x2 = e.clientX, y2 = e.clientY;
+            x2 = e.clientX;
 
-            rotation += (x2 - x1) / 10;
-            rotation %= 360;
-
-            document.getElementsByClassName('console')[0].innerText = rotation;
-            /*
-            if (rotation > -12.5 ) {
-                section[1].style.zIndex = "3";
-                section[0].style.zIndex = "1";
-
-            } else {
-                section[1].style.zIndex = "1";
-            } */
-
-
-            if (rotation < -12.5) {
-
-                section[2].style.zIndex = "3";
-                section[1].style.zIndex = "2";
-                section[0].style.zIndex = "1";
-
-                if (rotation < -102.5) {
-                    //console.log('change');
-                    section[2].style.zIndex = "2";
-                    section[1].style.zIndex = "3";
-                    section[0].style.zIndex = "1";
-
-                    if (rotation < -192.5) {
-                        section[2].style.zIndex = "1";
-                        section[1].style.zIndex = "2";
-                        section[0].style.zIndex = "3";
-                    }
-                }
-            }
-            else if (rotation > 12.5) {
-
-                section[0].style.zIndex = "3";
-                section[1].style.zIndex = "2";
-                section[2].style.zIndex = "1";
-
-                if (rotation > 167.5) {
-
-                    section[0].style.zIndex = "1";
-                    section[1].style.zIndex = "3";
-                    section[2].style.zIndex = "2";
-
-                    if (rotation > 257.5) {
-                        section[0].style.zIndex = "1";
-                        section[1].style.zIndex = "2";
-                        section[2].style.zIndex = "3";
-                    }
-                }
-            }
-
-
-
-
-
+            rotate();
 
             renderCSS();
 
             x1 = x2;
-            y1 = y2;
-
         }
 
         function renderCSS() {
@@ -416,11 +360,88 @@
             section[2].style.transform += `rotate3d(0, 1, 0, ${(rotation - 90)}deg)`;
         }
 
+        function rotate() {
+            rotation += (x2 - x1) / 10;
+            rotation %= 360;
+            document.getElementsByClassName('console')[0].innerText = rotation;
+
+            if (!isInside) {
+                section[0].style.display = "";
+                section[2].style.display = "";
+                if (rotation < -12.5) {
+                    //section[2].style.opacity = "0.3";
+                    section[2].style.zIndex = "3";
+                    section[1].style.zIndex = "2";
+                    section[0].style.zIndex = "1";
+
+                    if (rotation < -102.5) {
+                        //section[1].style.opacity = "0.3";
+                        section[1].style.zIndex = "3";
+                        section[2].style.zIndex = "2";
+                        section[0].style.zIndex = "1";
+
+                        if (rotation < -192.5) {
+                            //section[0].style.opacity = "0.3";
+                            section[0].style.zIndex = "3";
+                            section[2].style.zIndex = "1";
+                            section[1].style.zIndex = "2";
+
+                            /*
+                            if(rotation< -347.5) {
+                                section[0].style.opacity = "1";
+                                section[1].style.opacity = "1";
+                                section[2].style.opacity = "1";
+                            }
+                            */
+                        }
+                        
+                    }
+                }
+                else if (rotation > 12.5) {
+                    section[0].style.zIndex = "3";
+                    section[1].style.zIndex = "2";
+                    section[2].style.zIndex = "1";
+
+                    if (rotation > 167.5) {
+                        section[0].style.zIndex = "1";
+                        section[1].style.zIndex = "3";
+                        section[2].style.zIndex = "2";
+
+                        if (rotation > 257.5) {
+                            section[0].style.zIndex = "1";
+                            section[1].style.zIndex = "2";
+                            section[2].style.zIndex = "3";
+                        }
+                    }
+                }
+            } else {
+
+                rotation = Math.min(90, Math.max(-90,rotation));
+                if  (rotation > 12.5) {
+                    section[0].style.display = "none";
+                } else {
+                    section[0].style.display = "";
+                }
+
+                if  (rotation < -12.5) {
+                    section[2].style.display = "none";
+                } else {
+                    section[2].style.display = "";
+                }
+
+
+            }
+
+        }
+
+        function zoom() {
+            //distance = Math.max(-3000, Math.min(0, distance));
+            section[0].parentElement.style.transform = 'translateZ(' + distance + 'px)';
+        }
+
         function onMouseUp() {
             x1 = 0;
             x2 = 0;
-            y1 = 0;
-            y2 = 0;
 
             window.removeEventListener('mousemove', onMouseMove, false);
         }
@@ -428,8 +449,12 @@
         function onMouseWheel(e) {
             e.preventDefault();
             distance -= e.deltaY;
-            //distance = Math.max(-3000, Math.min(0, distance));
-            section[0].parentElement.style.transform = 'translateZ(' + distance + 'px)';
+            if (distance > -window.innerWidth/2) {
+                isInside = true;
+            } else {
+                isInside = false;
+            }
+            zoom();
         }
 
         function onTouchStart(e) {
@@ -441,8 +466,6 @@
                 case 1:
 
                     x1 = e.pageX;
-
-                    //document.getElementsByClassName("console")[0].innerText = e.targetTouches.length;
 
                     break;
 
@@ -460,7 +483,6 @@
             window.addEventListener('touchmove', onTouchMove, false);
             window.addEventListener('touchend', onTouchEnd, false);
 
-
         }
 
         function onTouchMove(e) {
@@ -473,18 +495,9 @@
 
                     x2 = e.pageX;
 
-                    rotation += (x2 - x1) / 10;
-                    rotation = Math.min(20, Math.max(-20, rotation));
+                    rotate();
 
-                    section[0].style.transform = `translate3d(${t01}px, ${t02}px, ${t03}px) `;
-                    section[0].style.transform += 'rotate3d(0,1,0,' + (rotation + 90) + 'deg)';
-
-                    section[1].style.transform = `translate3d(${t11}px, ${t12}px, ${t13}px) `;
-                    section[1].style.transform += 'rotate3d(0,1,0,' + (rotation) + 'deg)';
-
-                    section[2].style.transform = `translate3d(${t21}px, ${t22}px, ${t23}px) `;
-                    section[2].style.transform += 'rotate3d(0,1,0,' + (rotation - 90) + 'deg)';
-
+                    renderCSS();
                     x1 = x2;
 
                     break;
@@ -500,11 +513,9 @@
                         delta1 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
                         distance += (delta1 - delta0) * 5;
-                        distance = Math.max(-1600, Math.min(400, distance));
-
-                        document.getElementsByClassName("console")[0].innerText = delta0;
-                        section[0].parentElement.style.transform = 'translateZ(' + distance + 'px)';
-
+                        //distance = Math.max(-1600, Math.min(400, distance));
+                        //section[0].parentElement.style.transform = 'translateZ(' + distance + 'px)';
+                        zoom();
                         delta0 = delta1;
                     }
                     break;
@@ -527,7 +538,6 @@
         modePPT.addEventListener('pointerdown', switchToPPT, false);
 
         window.addEventListener('resize', onResize, false);
-
 
         window.addEventListener('mousedown', onMouseDown, false);
         window.addEventListener('mouseup', onMouseUp, false);
