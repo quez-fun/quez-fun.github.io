@@ -22,7 +22,7 @@
             padding: 30px 0;
             font-weight: 100;
 
-            display: none;
+            display: ;
         }
 
         .header>span {
@@ -85,19 +85,8 @@
             background-color: gray;
         }
 
-        .PPT {
-            display: none;
-            text-align: center;
-            margin: 200px 0;
-            color: rgb(0, 145, 255)
-        }
-
 
         /* booth */
-
-        body {
-            overflow: ;
-        }
 
         .intro {
             border: 2px solid rgb(0, 145, 255);
@@ -116,62 +105,43 @@
         }
 
         .section-one {
-            position: absolute;
             background-color: white;
 
-            z-index: 3;
         }
 
         .section-two {
-            position: absolute;
             background-color: #eee;
 
-            z-index: 2;
         }
 
         .section-three {
-            position: absolute;
             background-color: skyblue;
 
-            z-index: 1;
         }
 
         .subtitle {
             width: 20%;
         }
 
-        .plane {
-
-            display: none;
-            position: absolute;
-            width: 800px;
-            height: 500px;
-            background-color: red;
-            transform: rotateX(calc(var(--rotate-x, -24) * 1deg)) rotateY(calc(var(--rotate-y, -24) * 1deg)) rotateX(90deg) translate3d(0, 0, 0);
-        }
-
         .console {
             position: absolute;
             z-index: 99;
+            display: none;
         }
     </style>
 
-    <body>
+    <body id="bd">
 
         <div class="console">console area</div>
 
         <div class="header">
             <span class="mode">网页版</span>
             <span class="mode active">展位版</span>
-            <span class="mode">PPT版</span>
         </div>
 
         <div class="wrapper">
 
-            <div class="plane"></div>
-
             <div class="section section-one">
-                <!---->
                 <div class="img building"></div>
                 <div class="text intro">
                     <div>
@@ -185,7 +155,6 @@
             </div>
 
             <div class="section section-two">
-                <!---->
                 <div class="img workshop office"></div>
                 <div class="text subtitle">
                     <div>办公区域</div>
@@ -211,7 +180,6 @@
                 </div>
             </div>
 
-            <div class="PPT">功能开发中</div>
         </div>
 
     </body>
@@ -219,80 +187,120 @@
 
     <script>
 
+        const bd = document.getElementById('bd');
+
         const section = document.getElementsByClassName("section");
 
         const modeWeb = document.getElementsByClassName("mode")[0];
         const modeBooth = document.getElementsByClassName("mode")[1];
-        const modePPT = document.getElementsByClassName("mode")[2];
 
         const wrapper = document.getElementsByClassName("wrapper")[0];
-        const PPT = document.getElementsByClassName("PPT")[0];
 
         const imgs = document.getElementsByClassName("img");
         const texts = document.getElementsByClassName("text");
 
-        let distance = 0;
+        let distance = -1000;
         let rotation = 0;
+        let adjustY, adjustZ;
 
-        let isInside
+        let isWeb;
+        let isInside;
 
         let x1, x2;
         let delta0, delta1;
 
         function switchToWeb() {
+
+            section[0].style.transition = "transform 1.5s";
+            section[1].style.transition = "transform 1.5s";
+            section[2].style.transition = "transform 1.5s";
+
+            isWeb = true;
             modeWeb.className += " active";
             modeBooth.className = "mode";
-            modePPT.className = "mode";
 
             wrapper.style.display = "block";
-            PPT.style.display = "none";
+            wrapper.style.perspective = "";
 
             section[0].style.transform = "";
             section[1].style.transform = "";
+            section[2].style.transform = "";
 
             section[0].style.position = "";
             section[1].style.position = "";
+            section[2].style.position = "";
 
             section[0].style.width = "100%";
             section[1].style.width = "100%";
+            section[2].style.width = "100%";
+
+            section[0].style.zIndex = "";
+            section[1].style.zIndex = "";
+            section[2].style.zIndex = "";
+
+
+            section[0].parentElement.style.transform = '';
+            bd.style.overflow = "scroll";
 
             texts[0].style.border = "";
+
+            window.removeEventListener('resize', onResize, false);
+
+            window.removeEventListener('mousedown', onMouseDown, false);
+            window.removeEventListener('mouseup', onMouseUp, false);
+            window.removeEventListener('wheel', onMouseWheel, { passive: false });
+
+            window.removeEventListener('touchstart', onTouchStart, false);
+
+            document.removeEventListener('gesturestart', function (event) { event.preventDefault() }, false);
+
         }
 
         function switchToBooth() {
+
+            isWeb = false;
             modeBooth.className += " active";
             modeWeb.className = "mode";
-            modePPT.className = "mode";
 
             wrapper.style.display = "block";
-            PPT.style.display = "none";
 
             renderBooth();
-        }
 
-        function switchToPPT() {
-            modeBooth.className = "mode";
-            modeWeb.className = "mode";
-            modePPT.className += " active";
-
-            wrapper.style.display = "none";
-            PPT.style.display = "block";
         }
 
         function renderBooth() {
-            section[0].style.transform = "translate3d(-300px, -100px, -1000px) rotate3d(0, 1, 0, 60deg)";
-            section[1].style.transform = "translate3d(300px, -300px, -2500px)";
 
             section[0].style.position = "absolute";
             section[1].style.position = "absolute";
+            section[2].style.position = "absolute";
 
-            section[0].style.width = "600px";
-            section[1].style.width = "600px";
+
+            onResize();
+
+            bd.style.overflow = "hidden";
 
             texts[0].style.border = "2px solid rgb(0, 145, 255)";
-        }
 
-        let adjustY, adjustZ;
+            //setTimeout(() => {
+                section[0].style.transition = "";
+                section[1].style.transition = "";
+                section[2].style.transition = "";
+
+                window.addEventListener('resize', onResize, false);
+
+                window.addEventListener('mousedown', onMouseDown, false);
+                window.addEventListener('mouseup', onMouseUp, false);
+                window.addEventListener('wheel', onMouseWheel, { passive: false });
+
+                window.addEventListener('touchstart', onTouchStart, false);
+
+                document.addEventListener('gesturestart', function (event) { event.preventDefault() }, false);
+            //}, 1500);
+
+
+
+
+        }
 
         function onResize() {
 
@@ -301,9 +309,7 @@
 
             section[0].parentElement.style.perspective = width * 2 + 'px';
 
-            document.getElementsByClassName("console")[0].innerHTML =
-                section[0].parentElement.style.perspective;
-            //                'width: ' + width + '<br>height: ' + height;
+            section[0].parentElement.style.transform = 'translateZ(' + distance + 'px)';
 
             const boardWidth = width;
             const boardHeight = width * 5 / 8;
@@ -334,10 +340,10 @@
         function onMouseDown(e) {
 
             window.addEventListener('mousemove', onMouseMove, false);
-
             x1 = e.clientX;
 
         }
+
         function onMouseMove(e) {
 
             x2 = e.clientX;
@@ -350,6 +356,7 @@
         }
 
         function renderCSS() {
+
             section[0].style.transform = `translate3d(0px, ${adjustY}px, ${adjustZ}px) `;
             section[0].style.transform += `rotate3d(0, 1, 0, ${(rotation + 90)}deg)`;
 
@@ -394,7 +401,7 @@
                             }
                             */
                         }
-                        
+
                     }
                 }
                 else if (rotation > 12.5) {
@@ -416,14 +423,14 @@
                 }
             } else {
 
-                rotation = Math.min(90, Math.max(-90,rotation));
-                if  (rotation > 12.5) {
+                rotation = Math.min(90, Math.max(-90, rotation));
+                if (rotation > 12.5) {
                     section[0].style.display = "none";
                 } else {
                     section[0].style.display = "";
                 }
 
-                if  (rotation < -12.5) {
+                if (rotation < -12.5) {
                     section[2].style.display = "none";
                 } else {
                     section[2].style.display = "";
@@ -447,79 +454,90 @@
         }
 
         function onMouseWheel(e) {
-            e.preventDefault();
-            distance -= e.deltaY;
-            if (distance > -window.innerWidth/2) {
-                isInside = true;
-            } else {
-                isInside = false;
+
+            if (!isWeb) {
+                e.preventDefault();
+                distance -= e.deltaY;
+
+                document.getElementsByClassName("console")[0].innerHTML = distance;
+                if (distance > -window.innerWidth / 2) {
+                    isInside = true;
+                } else {
+                    isInside = false;
+                }
+                zoom();
             }
-            zoom();
+
         }
 
         function onTouchStart(e) {
 
-            e.preventDefault();
+            if (!isWeb) {
+                e.preventDefault();
 
-            switch (e.targetTouches.length) {
+                switch (e.targetTouches.length) {
 
-                case 1:
+                    case 1:
 
-                    x1 = e.pageX;
+                        x1 = e.pageX;
 
-                    break;
+                        break;
 
-                default:
+                    default:
 
-                    const deltaX = e.targetTouches[0].pageX - e.targetTouches[1].pageX;
-                    const deltaY = e.targetTouches[0].pageY - e.targetTouches[1].pageY;
-                    delta0 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    document.getElementsByClassName("console")[0].innerText = delta0;
+                        const deltaX = e.targetTouches[0].pageX - e.targetTouches[1].pageX;
+                        const deltaY = e.targetTouches[0].pageY - e.targetTouches[1].pageY;
+                        delta0 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                        document.getElementsByClassName("console")[0].innerText = delta0;
 
-                    break;
+                        break;
 
+                }
+
+                window.addEventListener('touchmove', onTouchMove, false);
+                window.addEventListener('touchend', onTouchEnd, false);
             }
 
-            window.addEventListener('touchmove', onTouchMove, false);
-            window.addEventListener('touchend', onTouchEnd, false);
 
         }
 
         function onTouchMove(e) {
 
-            e.preventDefault();
+            if (!isWeb) {
+                e.preventDefault();
 
-            switch (e.targetTouches.length) {
+                switch (e.targetTouches.length) {
 
-                case 1:
+                    case 1:
 
-                    x2 = e.pageX;
+                        x2 = e.pageX;
 
-                    rotate();
+                        rotate();
 
-                    renderCSS();
-                    x1 = x2;
+                        renderCSS();
+                        x1 = x2;
 
-                    break;
+                        break;
 
-                default:
+                    default:
 
-                    const deltaX = e.targetTouches[0].pageX - e.targetTouches[1].pageX;
-                    const deltaY = e.targetTouches[0].pageY - e.targetTouches[1].pageY;
+                        const deltaX = e.targetTouches[0].pageX - e.targetTouches[1].pageX;
+                        const deltaY = e.targetTouches[0].pageY - e.targetTouches[1].pageY;
 
-                    if (!delta0) {
-                        delta0 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                    } else {
-                        delta1 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                        if (!delta0) {
+                            delta0 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                        } else {
+                            delta1 = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-                        distance += (delta1 - delta0) * 5;
-                        //distance = Math.max(-1600, Math.min(400, distance));
-                        //section[0].parentElement.style.transform = 'translateZ(' + distance + 'px)';
-                        zoom();
-                        delta0 = delta1;
-                    }
-                    break;
+                            distance += (delta1 - delta0) * 5;
+                            //distance = Math.max(-1600, Math.min(400, distance));
+                            //section[0].parentElement.style.transform = 'translateZ(' + distance + 'px)';
+                            zoom();
+                            delta0 = delta1;
+                        }
+                        break;
 
+                }
             }
 
         }
@@ -530,22 +548,10 @@
             window.removeEventListener('touchend', onTouchEnd, false);
         }
 
-
-        onResize();
+        renderBooth();
 
         modeWeb.addEventListener('pointerdown', switchToWeb, false);
         modeBooth.addEventListener('pointerdown', switchToBooth, false);
-        modePPT.addEventListener('pointerdown', switchToPPT, false);
-
-        window.addEventListener('resize', onResize, false);
-
-        window.addEventListener('mousedown', onMouseDown, false);
-        window.addEventListener('mouseup', onMouseUp, false);
-        window.addEventListener('wheel', onMouseWheel, { passive: false });
-
-        window.addEventListener('touchstart', onTouchStart, false);
-
-        document.addEventListener('gesturestart', function (event) { event.preventDefault() }, false);
 
     </script>
 
