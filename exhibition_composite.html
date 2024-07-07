@@ -22,11 +22,12 @@
             padding: 30px 0;
             font-weight: 100;
 
-            display: ;
+            display: flex;
+            align-items: center;
         }
 
         .header>span {
-            margin: 30px;
+            margin: 0 30px;
         }
 
         .header>span.active {
@@ -36,19 +37,21 @@
 
         .img {
             width: 100%;
-            height: auto;
+            height: 100%;
             background-position: center center;
             background-repeat: no-repeat;
             background-size: cover;
         }
 
         .section {
-
             /*transition: transform 2s, opacity 2s;*/
             display: flex;
 
         }
 
+        .web {
+            display: block !important;
+        }
 
         .building {
             background-image: url("./img/building.jpeg");
@@ -59,10 +62,7 @@
 
         .text {
             background-color: ;
-
         }
-
-
 
         .subtitle>div {
             margin: 10px;
@@ -89,9 +89,7 @@
         /* booth */
 
         .intro {
-            border: 2px solid rgb(0, 145, 255);
             width: 50%;
-            height: 100%;
             overflow: scroll;
         }
 
@@ -106,17 +104,14 @@
 
         .section-one {
             background-color: white;
-
         }
 
         .section-two {
             background-color: #eee;
-
         }
 
         .section-three {
             background-color: skyblue;
-
         }
 
         .subtitle {
@@ -238,11 +233,22 @@
             section[1].style.zIndex = "";
             section[2].style.zIndex = "";
 
-
             section[0].parentElement.style.transform = '';
             bd.style.overflow = "scroll";
 
+
+            //details:
             texts[0].style.border = "";
+            section[0].style.display = "block";
+            section[1].style.display = "block";
+            section[2].style.display = "block";
+
+            section[0].style.height = 'auto';
+            section[1].style.height = 'auto';
+            section[2].style.height = 'auto';
+
+            document.getElementsByClassName('intro')[0].style.width = "100%";
+            document.getElementsByClassName('building')[0].style.width = "100%";
 
             window.removeEventListener('resize', onResize, false);
 
@@ -263,6 +269,14 @@
             modeWeb.className = "mode";
 
             wrapper.style.display = "block";
+
+            //details:
+            section[0].style.display = "flex";
+            section[1].style.display = "flex";
+            section[2].style.display = "flex";
+            document.getElementsByClassName('intro')[0].style.width = "50%";
+            document.getElementsByClassName('building')[0].style.width = "50%";
+
 
             renderBooth();
 
