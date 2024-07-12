@@ -1,5 +1,5 @@
 <html>
-<title>摄影展-画框</title>
+<title>Gallery</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <style>
@@ -40,11 +40,30 @@
       text-decoration: none;
       color: blue;
     }
+    .progress-bar {
+      height: 24px;
+      width: 30%;
+      border: 1px solid black;
+      padding: 2px;
+      margin: 0 auto;
+      top: 45%;
+      left: 35%;
+      z-index: 9;
+      position: absolute;
+      text-align: center;
+      line-height: 60px;
+    }
+    .progress-fill {
+      background-color: gray;
+      height: 100%;
+    }
 </style>
 
 <body>
-<div id="title">靠近画框，显示图片</div>
-<div id="btn"></div>
+  <div class="progress-bar">
+    <div class="progress-fill" style="width: 50%;"></div>
+    loading...
+  </div>
 <canvas id="canvas"></canvas>
 <script  id="vertex-shader-3d" type="x-shader/x-vertex">
     uniform mat4 u_worldViewProjection;
@@ -112,12 +131,7 @@ function main() {
 
   let isMouseDown = false;
 
-  //内容区
-
-  const title = document.getElementById("title");
-  const subtitles = ["<a href='./gallery-subscene-v2.html'>前往自动观赏模式</a>", "《秋光里的穿行》", "《通往仙境的道路》", "《西湖落日飞车》", "《镀金的西湖》", "《人在画中游》", "《西湖可以是任何一个湖》"];
-  
-
+  const loader = document.getElementsByClassName("progress-bar")[0];
 
   //互动区
 
@@ -175,6 +189,7 @@ function main() {
       // If all the images are loaded call the callback.
       if (imagesToLoad === 0) {
         callback(images);
+        loader.style.display = 'none';
       }
     };
 
