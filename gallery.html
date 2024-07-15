@@ -4,47 +4,21 @@
   <meta name="viewport"
     content="width=device-width, height=device-height, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <style>
+  
     body {
-      margin: 0;
+      margin: 0 auto;
       font-family: Arial, Helvetica, sans-serif;
-      color: grey;
+      color: #444;
       overflow: hidden;
+      width: auto;
+      height: auto;
     }
-
     canvas {
       border: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       display: block;
-
-    }
-
-    #title {
       position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      top: 5%;
-      display: none;
-    }
-
-    #btn {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 5%;
-    }
-
-    button {
-      background-color: white;
-      border: 1px solid black;
-      border-radius: 10px;
-      padding: 5px 8px;
-      margin: 8px;
-    }
-
-    a {
-      text-decoration: none;
-      color: blue;
     }
 
     .progress-bar {
@@ -68,12 +42,13 @@
   </style>
 
   <body>
-    <div class="progress-bar">
-      <div class="progress-fill" style="width: 50%;"></div>
-      loading...
-    </div>
-    <canvas id="canvas"></canvas>
-    <script id="vertex-shader-3d" type="x-shader/x-vertex">
+    <!--<div>temporary mobile console area:<div id="tmpConsole"></div>-->
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 50%;"></div>
+        loading...
+      </div>
+      <canvas id="canvas"></canvas>
+      <script id="vertex-shader-3d" type="x-shader/x-vertex">
     uniform mat4 u_worldViewProjection;
 
     attribute vec4 a_position;
@@ -90,7 +65,7 @@
       //v_fogDepth = -(u_worldViewProjection * a_position).z;
     }
 </script>
-    <script id="fragment-shader-3d" type="x-shader/x-fragment">
+      <script id="fragment-shader-3d" type="x-shader/x-fragment">
     precision highp float;
 
     varying vec2 v_texCoord;
@@ -110,7 +85,7 @@
       //gl_FragColor = mix(vec4(1.0, 0.8, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0), fogAmount);
     }
 </script>
-    <script id="frame-vertex-shader-3d" type="x-shader/x-vertex">
+      <script id="frame-vertex-shader-3d" type="x-shader/x-vertex">
     uniform mat4 u_worldViewProjection;
     
     attribute vec4 a_position;
@@ -119,7 +94,7 @@
       gl_Position = u_worldViewProjection * a_position;
     }
 </script>
-    <script id="frame-fragment-shader-3d" type="x-shader/x-fragment">
+      <script id="frame-fragment-shader-3d" type="x-shader/x-fragment">
 
   precision highp float;
 
@@ -129,567 +104,502 @@
 
 </script>
 
-    <script src="./webgl-utils.js"></script>
-    <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+      <script src="./webgl-utils.js"></script>
+      <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
 
-    <script>
-      "use strict";
+      
+      <script>
+        "use strict";
 
-      function main() {
+        function main() {
 
-        let isMouseDown = false;
+          //const tmpConsole = document.getElementById("tmpConsole");
 
-        const loader = document.getElementsByClassName("progress-bar")[0];
+          let isMouseDown = false;
 
-        //互动区
+          const loader = document.getElementsByClassName("progress-bar")[0];
 
-        const up = [0, 1, 0];
-        let aspect = window.innerWidth / window.innerHeight;
+          //互动区
 
-        let id = -1, viewMatrix = [];
+          const up = [0, 1, 0];
+          let aspect = window.innerWidth / window.innerHeight;
 
-        let cameraPosition = [0, 0, 265] /* -80*/, target = [0, 0, -1000];
-        //let cameraPosition=[-55*aspect,5*aspect,-130], target=[-50,0,-1000];
+          let id = -1, viewMatrix = [];
 
-        //let newCamPosStart = [0, 0, 10], newTargetPosStart=[100,0,-1000];
-        //类似打牌效果：
-        let newCamPosStart = [0, 0, 260], newTargetPosStart = [0, 0, -1000];
+          let cameraPosition = [0, 0, 265] /* -80*/, target = [0, 0, -1000];
+          //let cameraPosition=[-55*aspect,5*aspect,-130], target=[-50,0,-1000];
 
-        let camMov = [0, 0, 0], targetMov = [0, 0, 0];
-        let tweenCount = 20;
+          //let newCamPosStart = [0, 0, 10], newTargetPosStart=[100,0,-1000];
+          //类似打牌效果：
+          let newCamPosStart = [0, 0, 260], newTargetPosStart = [0, 0, -1000];
 
-        let isTweenReady = false, isTweening = false;
+          let camMov = [0, 0, 0], targetMov = [0, 0, 0];
+          let tweenCount = 20;
 
-
-        //gl初始化
-
-        var canvas = document.querySelector("#canvas");
-        var gl = canvas.getContext("webgl");
-        if (!gl) {
-          return;
-        }
+          let isTweenReady = false, isTweening = false;
 
 
-        //贴图区
-        const picNum = 38;
-        let loaded = 0;
-        let isLoaded = false;
-        let textures = [];
-        let objects = [];
+          //gl初始化
 
-        function loadImage(url, callback) {
-          var image = new Image();
-          image.src = url;
-          image.onload = callback;
-          return image;
-        }
+          var canvas = document.querySelector("#canvas");
+          var gl = canvas.getContext("webgl");
+          if (!gl) {
+            return;
+          }
 
 
-        var images = [];
-        function loadImages(urls, callback) {
-          //var images = [];
-          var imagesToLoad = urls.length;
+          //贴图区
+          const picNum = 38;
+          let loaded = 0;
+          let isLoaded = false;
+          let textures = [];
+          let objects = [];
 
-          // Called each time an image finished
-          // loading.
-          var onImageLoad = function () {
-            --imagesToLoad;
-            // If all the images are loaded call the callback.
-            if (imagesToLoad === 0) {
-              callback(images);
-              loader.style.display = 'none';
+          function loadImage(url, callback) {
+            var image = new Image();
+            image.src = url;
+            image.onload = callback;
+            return image;
+          }
+
+
+          var images = [];
+          function loadImages(urls, callback) {
+            //var images = [];
+            var imagesToLoad = urls.length;
+
+            // Called each time an image finished
+            // loading.
+            var onImageLoad = function () {
+              --imagesToLoad;
+              // If all the images are loaded call the callback.
+              if (imagesToLoad === 0) {
+                callback(images);
+                loader.style.display = 'none';
+              }
+            };
+
+            for (var ii = 0; ii < imagesToLoad; ++ii) {
+              var image = loadImage(urls[ii], onImageLoad);
+              images.push(image);
             }
+          }
+
+
+          gl.enable(gl.DEPTH_TEST);
+
+          const targetTexture = gl.createTexture();
+
+          /* 加入depth buffer（1/3） */
+          const depthBuffer = gl.createRenderbuffer();
+          const fb = gl.createFramebuffer();
+
+          const d = 0.1, picW = 5, picH = 8, frameW = 7, frameH = 10.5;
+          var arrays2 = {
+            position: {
+              numComponents: 3, data: [-frameW - d, frameH + d, 0, -frameW - d, frameH - d, 0, frameW - d, frameH - d, 0, frameW - d, frameH + d, 0,
+              -frameW - d, -frameH - d, 0, -frameW + d, -frameH - d, 0, -frameW + d, frameH - d, 0,
+              frameW + d, -frameH - d, 0, frameW + d, -frameH + d, 0, -frameW + d, -frameH + d, 0,
+              frameW - d, -frameH + d, 0, frameW + d, frameH + d, 0,
+                // -picW,-picH,0, picW,-picH,0, -picW,picH,0, picW,picH,0
+              ],
+            },
+            texcoord: {
+              numComponents: 2, data: [0, 1, 1, 1, 0, 0, 1, 0,
+                0, 1, 1, 1, 0, 0, 1, 0,
+                0, 1, 1, 1, 0, 0, 1, 0,
+                0, 1, 1, 1, 0, 0, 1, 0,
+                //  0, 1, 1, 1, 0, 0, 1, 0
+              ],
+            },
+            indices: {
+              numComponents: 3, data: [0, 1, 2, 0, 2, 3,
+                1, 4, 6, 4, 5, 6,
+                5, 7, 9, 7, 8, 9,
+                10, 8, 11, 11, 3, 10,
+                //    0+12, 1+12, 2+12, 1+12, 2+12, 3+12
+              ],
+            },
           };
 
-          for (var ii = 0; ii < imagesToLoad; ++ii) {
-            var image = loadImage(urls[ii], onImageLoad);
-            images.push(image);
+
+          var arrays = {
+
+            position: { numComponents: 3, data: [-picW, -picH, 0, picW, -picH, 0, -picW, picH, 0, picW, picH, 0], },
+            texcoord: { numComponents: 2, data: [0, 1, 1, 1, 0, 0, 1, 0], },
+            indices: { numComponents: 3, data: [0, 1, 2, 1, 2, 3], },
+          };
+
+          var bufferInfo = webglUtils.createBufferInfoFromArrays(gl, arrays);
+          var bufferInfo2 = webglUtils.createBufferInfoFromArrays(gl, arrays2);
+          var programInfo = webglUtils.createProgramInfo(gl, ["vertex-shader-3d", "fragment-shader-3d"]);
+          var frameProgramInfo = webglUtils.createProgramInfo(gl, ["frame-vertex-shader-3d", "frame-fragment-shader-3d"]);
+
+          function degToRad(d) {
+            return d * Math.PI / 180;
           }
-        }
 
+          var fieldOfViewRadians = degToRad(60);
 
-        gl.enable(gl.DEPTH_TEST);
+          var uniformsThatAreComputedForEachObject = {
+            u_worldViewProjection: m4.identity(),
+          };
 
-        const targetTexture = gl.createTexture();
+          var pickUniforms = {
+            u_worldViewProjection: m4.identity(),
+          };
 
-        /* 加入depth buffer（1/3） */
-        const depthBuffer = gl.createRenderbuffer();
-        const fb = gl.createFramebuffer();
 
-        const d = 0.1, picW = 5, picH = 8, frameW = 7, frameH = 10.5;
-        var arrays2 = {
-          position: {
-            numComponents: 3, data: [-frameW - d, frameH + d, 0, -frameW - d, frameH - d, 0, frameW - d, frameH - d, 0, frameW - d, frameH + d, 0,
-            -frameW - d, -frameH - d, 0, -frameW + d, -frameH - d, 0, -frameW + d, frameH - d, 0,
-            frameW + d, -frameH - d, 0, frameW + d, -frameH + d, 0, -frameW + d, -frameH + d, 0,
-            frameW - d, -frameH + d, 0, frameW + d, frameH + d, 0,
-              // -picW,-picH,0, picW,-picH,0, -picW,picH,0, picW,picH,0
-            ],
-          },
-          texcoord: {
-            numComponents: 2, data: [0, 1, 1, 1, 0, 0, 1, 0,
-              0, 1, 1, 1, 0, 0, 1, 0,
-              0, 1, 1, 1, 0, 0, 1, 0,
-              0, 1, 1, 1, 0, 0, 1, 0,
-              //  0, 1, 1, 1, 0, 0, 1, 0
-            ],
-          },
-          indices: {
-            numComponents: 3, data: [0, 1, 2, 0, 2, 3,
-              1, 4, 6, 4, 5, 6,
-              5, 7, 9, 7, 8, 9,
-              10, 8, 11, 11, 3, 10,
-              //    0+12, 1+12, 2+12, 1+12, 2+12, 3+12
-            ],
-          },
-        };
+          //fog区
+          //var fogColorLocation = gl.getUniformLocation(programInfo.program, "u_fogColor");
+          //var fogAmountLocation = gl.getUniformLocation(programInfo.program, "u_fogAmount");
 
+          var opacityLocation = gl.getUniformLocation(programInfo.program, "u_opacity");
+          function drawScene() {
 
-        var arrays = {
+            resizeCanvasToDisplaySize(canvas);
+            aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
-          position: { numComponents: 3, data: [-picW, -picH, 0, picW, -picH, 0, -picW, picH, 0, picW, picH, 0], },
-          texcoord: { numComponents: 2, data: [0, 1, 1, 1, 0, 0, 1, 0], },
-          indices: { numComponents: 3, data: [0, 1, 2, 1, 2, 3], },
-        };
+            //需要一个viewMatrix
 
-        var bufferInfo = webglUtils.createBufferInfoFromArrays(gl, arrays);
-        var bufferInfo2 = webglUtils.createBufferInfoFromArrays(gl, arrays2);
-        var programInfo = webglUtils.createProgramInfo(gl, ["vertex-shader-3d", "fragment-shader-3d"]);
-        var frameProgramInfo = webglUtils.createProgramInfo(gl, ["frame-vertex-shader-3d", "frame-fragment-shader-3d"]);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-        function degToRad(d) {
-          return d * Math.PI / 180;
-        }
+            // Tell WebGL how to convert from clip space to pixels
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-        var fieldOfViewRadians = degToRad(60);
+            //gl.clearColor(1.0,1.0,1.0,1.0);
+            // Clear the canvas AND the depth buffer.
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        var uniformsThatAreComputedForEachObject = {
-          u_worldViewProjection: m4.identity(),
-        };
+            var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
-        var pickUniforms = {
-          u_worldViewProjection: m4.identity(),
-        };
+            var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
+            gl.useProgram(programInfo.program);
 
-        //fog区
-        //var fogColorLocation = gl.getUniformLocation(programInfo.program, "u_fogColor");
-        //var fogAmountLocation = gl.getUniformLocation(programInfo.program, "u_fogAmount");
+            // Setup all the needed buffers and attributes.
+            webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo);
 
-        var opacityLocation = gl.getUniformLocation(programInfo.program, "u_opacity");
-        function drawScene() {
+            //webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo2);
 
-          resizeCanvasToDisplaySize(canvas);
-          aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+            gl.enable(gl.BLEND);
+            //gl.blendFunc(gl.SRC_COLOR, gl.DST_COLOR);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            //gl.blendFunc(gl.ONE, gl.DST_COLOR);
+            //gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
+            //gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-          //需要一个viewMatrix
+            objects.forEach(function (object) {
 
-          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+              var worldMatrix = m4.xRotation(0);
+              worldMatrix = m4.translate(worldMatrix, -object.xTranslation, object.yTranslation, object.zTranslation);
+              worldMatrix = m4.yRotate(worldMatrix, object.yRotation);
 
-          // Tell WebGL how to convert from clip space to pixels
-          gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+              // Multiply the matrices.
+              m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
 
-          //gl.clearColor(1.0,1.0,1.0,1.0);
-          // Clear the canvas AND the depth buffer.
-          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+              // Set the uniforms we just computed
+              webglUtils.setUniforms(programInfo, uniformsThatAreComputedForEachObject);
 
-          var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
+              // Set the uniforms that are specific to the this object.
+              webglUtils.setUniforms(programInfo, object.materialUniforms);
 
-          var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-          gl.useProgram(programInfo.program);
+              if (cameraPosition[0] === 0) {
+                const opacity = (Math.sin((Math.abs(cameraPosition[2]) - 5) / 10 * Math.PI) + 2) / 2;
+                gl.uniform1f(opacityLocation, opacity);
+              }
+              else {
+                const opacity = 0.45 + 2 / Math.abs(cameraPosition[0]);
+                gl.uniform1f(opacityLocation, opacity);
+                console.log(cameraPosition[0], target[0]);
+              }
 
-          // Setup all the needed buffers and attributes.
-          webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+              // Draw the geometry.
+              //gl.drawElements(gl.TRIANGLES, bufferInfo2.numElements, gl.UNSIGNED_SHORT, 0);
+              gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
 
-          //webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo2);
 
-          gl.enable(gl.BLEND);
-          //gl.blendFunc(gl.SRC_COLOR, gl.DST_COLOR);
-          gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-          //gl.blendFunc(gl.ONE, gl.DST_COLOR);
-          //gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
-          //gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+            });
 
-          objects.forEach(function (object) {
 
-            var worldMatrix = m4.xRotation(0);
-            worldMatrix = m4.translate(worldMatrix, -object.xTranslation, object.yTranslation, object.zTranslation);
-            worldMatrix = m4.yRotate(worldMatrix, object.yRotation);
+            //console.log('drawScene');
+          }
 
-            // Multiply the matrices.
-            m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
 
-            // Set the uniforms we just computed
-            webglUtils.setUniforms(programInfo, uniformsThatAreComputedForEachObject);
+          function drawFrames() {
 
-            // Set the uniforms that are specific to the this object.
-            webglUtils.setUniforms(programInfo, object.materialUniforms);
+            resizeCanvasToDisplaySize(canvas);
+            aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
+            //需要一个viewMatrix
 
-            if (cameraPosition[0] === 0) {
-              const opacity = (Math.sin((Math.abs(cameraPosition[2]) - 5) / 10 * Math.PI) + 2) / 2;
-              gl.uniform1f(opacityLocation, opacity);
-            }
-            else {
-              const opacity = 0.45 + 2 / Math.abs(cameraPosition[0]);
-              gl.uniform1f(opacityLocation, opacity);
-              console.log(cameraPosition[0], target[0]);
-            }
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-            // Draw the geometry.
-            //gl.drawElements(gl.TRIANGLES, bufferInfo2.numElements, gl.UNSIGNED_SHORT, 0);
-            gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+            // Tell WebGL how to convert from clip space to pixels
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
+            //gl.clearColor(1.0,1.0,1.0,1.0);
+            // Clear the canvas AND the depth buffer.
+            //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-          });
+            var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
+            var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-          //console.log('drawScene');
-        }
+            gl.useProgram(frameProgramInfo.program);
 
+            // Setup all the needed buffers and attributes.
+            //webglUtils.setBuffersAndAttributes(gl, frameProgramInfo, bufferInfo);
 
-        function drawFrames() {
+            webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo2);
 
-          resizeCanvasToDisplaySize(canvas);
-          aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+            gl.enable(gl.BLEND);
+            //gl.blendFunc(gl.SRC_COLOR, gl.DST_COLOR);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            //gl.blendFunc(gl.ONE, gl.DST_COLOR);
+            //gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
+            //gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-          //需要一个viewMatrix
+            objects.forEach(function (object) {
 
-          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+              var worldMatrix = m4.xRotation(0);
+              worldMatrix = m4.translate(worldMatrix, object.xTranslation, object.yTranslation, object.zTranslation);
+              worldMatrix = m4.yRotate(worldMatrix, object.yRotation);
 
-          // Tell WebGL how to convert from clip space to pixels
-          gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+              // Multiply the matrices.
+              m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
 
-          //gl.clearColor(1.0,1.0,1.0,1.0);
-          // Clear the canvas AND the depth buffer.
-          //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+              // Set the uniforms we just computed
+              webglUtils.setUniforms(frameProgramInfo, uniformsThatAreComputedForEachObject);
 
-          var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
+              // Set the uniforms that are specific to the this object.
+              webglUtils.setUniforms(frameProgramInfo, object.materialUniforms);
 
-          var viewProjectionMatrix = m4.multiply(projectionMatrix, viewMatrix);
 
-          gl.useProgram(frameProgramInfo.program);
+              //gl.uniform1f(opacityLocation, opacity);
+              //console.log(cameraPosition[2], opacity);
+              // Draw the geometry.
+              //gl.drawElements(gl.TRIANGLES, bufferInfo2.numElements, gl.UNSIGNED_SHORT, 0);
+              gl.drawElements(gl.TRIANGLES, bufferInfo2.numElements, gl.UNSIGNED_SHORT, 0);
 
-          // Setup all the needed buffers and attributes.
-          //webglUtils.setBuffersAndAttributes(gl, frameProgramInfo, bufferInfo);
 
-          webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo2);
+            });
 
-          gl.enable(gl.BLEND);
-          //gl.blendFunc(gl.SRC_COLOR, gl.DST_COLOR);
-          gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-          //gl.blendFunc(gl.ONE, gl.DST_COLOR);
-          //gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
-          //gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-          objects.forEach(function (object) {
+            //console.log('drawScene');
+          }
 
-            var worldMatrix = m4.xRotation(0);
-            worldMatrix = m4.translate(worldMatrix, object.xTranslation, object.yTranslation, object.zTranslation);
-            worldMatrix = m4.yRotate(worldMatrix, object.yRotation);
+          function camPos() {
 
-            // Multiply the matrices.
-            m4.multiply(viewProjectionMatrix, worldMatrix, uniformsThatAreComputedForEachObject.u_worldViewProjection);
+            if (id < 0) {
 
-            // Set the uniforms we just computed
-            webglUtils.setUniforms(frameProgramInfo, uniformsThatAreComputedForEachObject);
+              var cameraMatrix = m4.lookAt(cameraPosition, target, up, m4.identity());
+              viewMatrix = m4.inverse(cameraMatrix);
 
-            // Set the uniforms that are specific to the this object.
-            webglUtils.setUniforms(frameProgramInfo, object.materialUniforms);
-
-
-            //gl.uniform1f(opacityLocation, opacity);
-            //console.log(cameraPosition[2], opacity);
-            // Draw the geometry.
-            //gl.drawElements(gl.TRIANGLES, bufferInfo2.numElements, gl.UNSIGNED_SHORT, 0);
-            gl.drawElements(gl.TRIANGLES, bufferInfo2.numElements, gl.UNSIGNED_SHORT, 0);
-
-
-          });
-
-
-          //console.log('drawScene');
-        }
-
-        function camPos() {
-
-          if (id < 0) {
-
-            var cameraMatrix = m4.lookAt(cameraPosition, target, up, m4.identity());
-            viewMatrix = m4.inverse(cameraMatrix);
-
-          } /* else if (id==0){
+            } /* else if (id==0){
         cameraPosition = [0,0,0];
         target = [0,0,-1000];
       }*/
 
 
-          else {
+            else {
 
-            /*
-            cameraPosition = [(1*id-15)*aspect, id*aspect, -20*id-20];
-            target = [(1*id+5)*aspect, id*aspect, -1000];
-            */
+              /*
+              cameraPosition = [(1*id-15)*aspect, id*aspect, -20*id-20];
+              target = [(1*id+5)*aspect, id*aspect, -1000];
+              */
 
-            cameraPosition = [0, 0, -28];
-            target = [0, 0, -1000];
+              cameraPosition = [0, 0, -28];
+              target = [0, 0, -1000];
 
+            }
 
           }
 
-        }
+          function resizeCanvasToDisplaySize(canvas, multiplier) {
+            multiplier = multiplier || 2;
+            const width = canvas.clientWidth * multiplier | 0;
+            const height = canvas.clientHeight * multiplier | 0;
+            if (canvas.width !== width || canvas.height !== height) {
+              canvas.width = width;
+              canvas.height = height;
+              aspect = width / height;
+              return true;
+            }
+            return false;
+            //drawScene();
+          }
 
-        function tweenRotate(e) {
+          let imgList = [];
+          function generateImgList() {
+            for (let i = 0; i < picNum; i++) {
+              imgList.push("./pic-v1/" + (i + 1) + ".jpg");
+            }
+          }
 
-          if (!isTweening) {
-            id = e.target.id;
+
+          function init() {
+
             camPos();
-            tween();
-            title.innerHTML = subtitles[id];
+
+            generateImgList();
+            loadImages(imgList, () => {
+              for (var ii = 0; ii < picNum; ++ii) {
+                var texture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+
+                // Set the parameters so we can render any size image.
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+                // Upload the image into the texture.
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[ii]);
+
+                // add the texture to the array of textures.
+                textures.push(texture);
+                //console.log(textures);
+
+
+
+              }
+
+
+
+
+              for (var ii = 0; ii < picNum; ++ii) {
+                objects.push({
+
+                  yRotation: 0,
+                  xTranslation: 0,//ii-10,
+                  yTranslation: 0,
+                  zTranslation: -500 + ii * 20,
+                  materialUniforms: {
+                    u_diffuse: textures[ii],
+                    //u_opacity: 0.5,
+                  },
+                  pickIDUniform: {
+                    u_id: [(ii + 1) / 255, 0, 0, 1],
+                  }
+                });
+              }
+
+              render();
+
+            });
           }
 
-        }
 
-        function tween() {
+          init();
 
-          if (tweenCount > 0) {
+          let x0 = 0, x1 = 0, y0 = 0, y1 = 0;
 
-            if (!isTweenReady) {
-              prepareTween();
-            }
-
-            isTweening = true;
-
-            tweenCount -= 1;
-
-            newCamPosStart[0] += camMov[0];
-            newCamPosStart[1] += camMov[1];
-            newCamPosStart[2] += camMov[2];
-
-            newTargetPosStart[0] += targetMov[0];
-            newTargetPosStart[1] += targetMov[1];
-            newTargetPosStart[2] += targetMov[2];
-
-            var cameraMatrix = m4.lookAt(newCamPosStart, newTargetPosStart, up, m4.identity());
-            viewMatrix = m4.inverse(cameraMatrix);
-
-            requestAnimationFrame(drawScene);
-
-          } else {
-            isTweenReady = false;
-            isTweening = false;
-            //这里考虑清空并初始化初始值和差值，以准备重新开始prepareTween
-            newCamPosStart = cameraPosition;
-            newTargetPosStart = target;
-            tweenCount = 10;
+          function onMouseDown(e) {
+            isMouseDown = true;
+            x0 = e.clientX;
+            y0 = e.clientY;
+            canvas.addEventListener('mousemove', onMouseMove, false);
           }
 
-        }
+          function onMouseMove(e) {
+            //console.log(e.clientX, e.clientY);
+            if (isMouseDown) {
+              x1 = e.clientX;
+              y1 = e.clientY;
 
-        function prepareTween() {
+              const deltaX = x1 - x0;
+              const deltaY = y1 - y0;
 
-          const newCamPosEnd = cameraPosition;
-          const newTargetPosEnd = target;
+              //if(deltaX > 0.5 || deltaY >0.5){
+              cameraPosition[0] -= deltaX / 25;
+              //cameraPosition[1]+=deltaY/25;
 
-          camMov[0] = (newCamPosEnd[0] - newCamPosStart[0]) / tweenCount;
-          camMov[1] = (newCamPosEnd[1] - newCamPosStart[1]) / tweenCount;
-          camMov[2] = (newCamPosEnd[2] - newCamPosStart[2]) / tweenCount;
+              target[0] += deltaX;
+              //target[1]-=deltaY;
 
-          targetMov[0] = (newTargetPosEnd[0] - newTargetPosStart[0]) / tweenCount;
-          targetMov[1] = (newTargetPosEnd[1] - newTargetPosStart[1]) / tweenCount;
-          targetMov[2] = (newTargetPosEnd[2] - newTargetPosStart[2]) / tweenCount;
+              if ((cameraPosition[2]) % 20 < 18) {
+                cameraPosition[2] += 0.5;
+              }
 
-          isTweenReady = true;
+              var cameraMatrix = m4.lookAt(cameraPosition, target, up, m4.identity());
+              viewMatrix = m4.inverse(cameraMatrix);
 
-        }
+              render();
 
-        function resizeCanvasToDisplaySize(canvas, multiplier) {
-          multiplier = multiplier || 2;
-          const width = canvas.clientWidth * multiplier | 0;
-          const height = canvas.clientHeight * multiplier | 0;
-          if (canvas.width !== width || canvas.height !== height) {
-            canvas.width = width;
-            canvas.height = height;
-            aspect = width / height;
-            return true;
-          }
-          return false;
-          //drawScene();
-        }
-
-        let imgList = [];
-        function generateImgList() {
-          for (let i = 0; i < picNum; i++) {
-            imgList.push("./pic-v1/" + (i + 1) + ".jpg");
-          }
-        }
-
-
-        function init() {
-
-          camPos();
-
-          generateImgList();
-          //tween();
-          loadImages(imgList, () => {
-            for (var ii = 0; ii < picNum; ++ii) {
-              var texture = gl.createTexture();
-              gl.bindTexture(gl.TEXTURE_2D, texture);
-
-              // Set the parameters so we can render any size image.
-              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-              // Upload the image into the texture.
-              gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[ii]);
-
-              // add the texture to the array of textures.
-              textures.push(texture);
-              //console.log(textures);
-
-
+              x0 = x1;
+              y0 = y1;
 
             }
 
+          }
 
+          function onMouseUp() {
+            isMouseDown = false;
+            canvas.removeEventListener('mousemove', onMouseMove, false);
+          }
 
+          function onMouseWheel(e) {
+            //console.log(e.deltaY);
+            if (Math.abs(cameraPosition[0]) < 5) {
 
-            for (var ii = 0; ii < picNum; ++ii) {
-              objects.push({
+              if (cameraPosition[0] > 0) {
+                cameraPosition[0] -= 0.1;
+                cameraPosition[0] = Math.max(cameraPosition[0], 0)
+              } else {
+                cameraPosition[0] += 0.1;
+                cameraPosition[0] = Math.min(cameraPosition[0], 0)
+              }
 
-                yRotation: 0,
-                xTranslation: 0,//ii-10,
-                yTranslation: 0,
-                zTranslation: -500 + ii * 20,
-                materialUniforms: {
-                  u_diffuse: textures[ii],
-                  //u_opacity: 0.5,
-                },
-                pickIDUniform: {
-                  u_id: [(ii + 1) / 255, 0, 0, 1],
-                }
-              });
+              target[0] = 0;//如何更加smooth
             }
-
-
-            //tween();
-
-            render();
-
-          });
-        }
-
-
-        init();
-
-        let x0 = 0, x1 = 0, y0 = 0, y1 = 0;
-
-        function onMouseDown(e) {
-          isMouseDown = true;
-          x0 = e.clientX;
-          y0 = e.clientY;
-          canvas.addEventListener('mousemove', onMouseMove, false);
-        }
-
-        function onMouseMove(e) {
-          //console.log(e.clientX, e.clientY);
-          if (isMouseDown) {
-            x1 = e.clientX;
-            y1 = e.clientY;
-
-            const deltaX = x1 - x0;
-            const deltaY = y1 - y0;
-
-            //if(deltaX > 0.5 || deltaY >0.5){
-            cameraPosition[0] -= deltaX / 25;
-            //cameraPosition[1]+=deltaY/25;
-
-            target[0] += deltaX;
-            //target[1]-=deltaY;
-
-            if ((cameraPosition[2]) % 20 < 18) {
-              cameraPosition[2] += 0.5;
-            }
-
+            cameraPosition[2] += e.deltaY / 15;
+            // console.log(cameraPosition[2]);
+            //target=[0,0,-1000];
+            cameraPosition[2] = Math.max(-480, cameraPosition[2]);
+            cameraPosition[2] = Math.min(278, cameraPosition[2]);
             var cameraMatrix = m4.lookAt(cameraPosition, target, up, m4.identity());
             viewMatrix = m4.inverse(cameraMatrix);
 
             render();
 
-            x0 = x1;
-            y0 = y1;
-
           }
 
-        }
-
-        function onMouseUp() {
-          isMouseDown = false;
-          canvas.removeEventListener('mousemove', onMouseMove, false);
-        }
-
-        function onMouseWheel(e) {
-          //console.log(e.deltaY);
-          if (Math.abs(cameraPosition[0]) < 5) {
-
-            if (cameraPosition[0] > 0) {
-              cameraPosition[0] -= 0.1;
-              cameraPosition[0] = Math.max(cameraPosition[0], 0)
-            } else {
-              cameraPosition[0] += 0.1;
-              cameraPosition[0] = Math.min(cameraPosition[0], 0)
-            }
-
-            target[0] = 0;//如何更加smooth
+          function render() {
+            drawScene();
+            drawFrames();
           }
-          cameraPosition[2] += e.deltaY / 15;
-          // console.log(cameraPosition[2]);
-          //target=[0,0,-1000];
-          cameraPosition[2] = Math.max(-480, cameraPosition[2]);
-          cameraPosition[2] = Math.min(278, cameraPosition[2]);
-          var cameraMatrix = m4.lookAt(cameraPosition, target, up, m4.identity());
-          viewMatrix = m4.inverse(cameraMatrix);
 
-          render();
+          //canvas.addEventListener('click', pick, false);
 
-        }
+          function touchstart(e) {
 
-        function render() {
-          drawScene();
-          drawFrames();
-        }
+            //tmpConsole.innerText = 'touchstart';
 
-        //canvas.addEventListener('click', pick, false);
+            x0 = e.pageX;
+            y0 = e.pageY;
 
-        function touchstart(e) {
+            window.addEventListener('touchmove', touchmove, false);
+            window.addEventListener('touchend', touchend, false);
+          }
 
-          x0 = e.pageX;
-          y0 = e.pageY;
-
-          canvas.addEventListener('mousemove', touchmove, false);
-          canvas.addEventListener('touchend', touchend, false);
-        }
-
-        function touchmove(e){
+          function touchmove(e) {
             x1 = e.pageX;
             y1 = e.pageY;
 
+            //tmpConsole.innerText = 'touchmove';
+
             const deltaX = x1 - x0;
             const deltaY = y1 - y0;
 
-            //if(deltaX > 0.5 || deltaY >0.5){
             cameraPosition[0] -= deltaX / 25;
-            //cameraPosition[1]+=deltaY/25;
 
             target[0] += deltaX;
-            //target[1]-=deltaY;
-
-            if ((cameraPosition[2]) % 20 < 18) {
-              cameraPosition[2] += 0.5;
-            }
+          
+            cameraPosition[2] += deltaY / 15;
+            cameraPosition[2] = Math.max(-480, cameraPosition[2]);
+            cameraPosition[2] = Math.min(278, cameraPosition[2]);
 
             var cameraMatrix = m4.lookAt(cameraPosition, target, up, m4.identity());
             viewMatrix = m4.inverse(cameraMatrix);
@@ -699,34 +609,35 @@
             x0 = x1;
             y0 = y1;
 
+          }
+
+          function touchend() {
+            x1 = 0;
+            x0 = 0;
+            y1 = 0;
+            y0 = 0;
+            window.removeEventListener('touchmove', touchmove, false);
+            window.removeEventListener('touchend', touchend, false);
+          }
+
+          window.addEventListener('resize', render, false);
+          canvas.addEventListener('mousedown', onMouseDown, false);
+
+          canvas.addEventListener('mouseup', onMouseUp, false);
+          //window.addEventListener('load', init, false);
+
+          canvas.addEventListener('wheel', onMouseWheel, { passive: false });
+
+          window.addEventListener('touchstart', touchstart, false);
+
+
         }
 
-        function touchend(){
-          x1 = 0;
-          x0 = 0;
-          y1 = 0;
-          y0 = 0;
-          window.removeEventListener('touchmove', touchmove, false);
-          window.removeEventListener('touchend', touchend, false);
-        }
-
-        window.addEventListener('resize', render, false);
-        canvas.addEventListener('mousedown', onMouseDown, false);
-
-        canvas.addEventListener('mouseup', onMouseUp, false);
-        //window.addEventListener('load', init, false);
-
-        canvas.addEventListener('wheel', onMouseWheel, { passive: false });
-
-        canvas.addEventListener('touchstart', touchstart, false);
+        main();
 
         document.addEventListener('gesturestart', function (event) { event.preventDefault() }, false);
-      }
 
-      main();
-
-
-    </script>
+      </script>
 
 
   </body>
