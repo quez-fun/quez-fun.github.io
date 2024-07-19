@@ -80,15 +80,27 @@
       transform: translate(-50%, 95%);
       width: 0;
     }
+
+    #lang {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      color: #1d71b8;
+      z-index: 10;
+    }
+
+    #lang:hover {
+      color: rgb(174, 77, 204);
+    }
   </style>
 
   <body>
     <!--<div>temporary mobile console area:<div id="tmpConsole"></div>
     </div>-->
+    <div id="lang">中文</div>
     <span class="tag">
       test tag
     </span>
-
     <div id="title-area">
       <h4>My Projects</h4>
       <p>move mouse over to view projects</p>
@@ -140,6 +152,16 @@
       "use strict";
 
       //const tmpConsole = document.getElementById("tmpConsole");
+
+      const lang = document.getElementById('lang');
+
+      const langModes = {
+        "en": ["My Projects", "move mouse over to view projects"],
+        "cn": ["我的项目", "移动鼠标 了解项目"]
+      }
+      let langMode = "en";
+
+      const titleArea = document.getElementById('title-area');
 
       const tag = document.getElementsByClassName('tag')[0];
       const tagContent = [
@@ -597,7 +619,7 @@
 
               y1 = e.pageY;
 
-              const factor = (y1 - y0)/5;
+              const factor = (y1 - y0) / 5;
 
               cameraPosition[0] += factor;
 
@@ -662,7 +684,6 @@
 
 
 
-
         function shrink() {
 
           if (gapH > 25) { //这个就是最终的位移值
@@ -703,14 +724,13 @@
 
             window.addEventListener('touchstart', touchstart, false);
 
+
           }
 
         }
 
         drawObjects();
         drawScene();
-
-
 
       }
 
@@ -744,9 +764,25 @@
       }
 
 
+      function switchLang() {
+
+        if (langMode === "en") {
+          langMode = "cn";
+          lang.innerText = "English";
+          titleArea.innerHTML = '<h4>' + langModes.cn[0] + '</h4><p>' + langModes.cn[1] + '</p>';
+        } else {
+          langMode = "en";
+          lang.innerText = "中文";
+          titleArea.innerHTML = '<h4>' + langModes.en[0] + '</h4><p>' + langModes.en[1] + '</p>';
+        }
+
+      }
+
       main();
 
       document.addEventListener('gesturestart', function (event) { event.preventDefault() }, false);
+
+      lang.addEventListener('click', switchLang, false);
 
     </script>
 
