@@ -153,6 +153,11 @@
 
       //const tmpConsole = document.getElementById("tmpConsole");
 
+      let initialAnimation = true;
+      let oldPickNdx = -1, pickNdx, isPicked = false;
+
+      let y0, y1, delta0, delta1;
+
       const lang = document.getElementById('lang');
 
       const langModes = {
@@ -171,11 +176,11 @@
         [], //3
         [], //4
         [], //5
-        ['composite', 'https://quez-fun.github.io/exhibition_composite.html'], //6
-        ['solar', 'https://quez-fun.github.io/solar/'], //7
-        ['mini-pano', 'https://quez-fun.github.io/mini-panorama/'], //8
-        ['vist gallery', 'https://quez-fun.github.io/gallery.html'], //9
-        ['booth', 'https://quez-fun.github.io/exhibition_booth.html'], //10
+        ['composite', 'https://quez-fun.github.io/exhibition_composite.html', '综合'], //6
+        ['solar', 'https://quez-fun.github.io/solar/', '太阳能'], //7
+        ['mini-pano', 'https://quez-fun.github.io/mini-panorama/', '迷你全景'], //8
+        ['vist gallery', 'https://quez-fun.github.io/gallery.html', '参观画廊'], //9
+        ['booth', 'https://quez-fun.github.io/exhibition_booth.html', '展厅'], //10
       ];
 
       //canvas & context
@@ -200,10 +205,6 @@
         u_worldViewProjection: m4.identity(),
       };
 
-      let initialAnimation = true;
-      let oldPickNdx = -1, pickNdx, isPicked = false;
-
-      let y0, y1, delta0, delta1;
 
       //create frame buffer
       const targetTexture = gl.createTexture();
@@ -389,12 +390,18 @@
 
             pickNdx = (pixels[0] - 1) * rowNum + pixels[1];
 
-            if (pickNdx == 9 | pickNdx == 8 | pickNdx == 7 | pickNdx == 6 | pickNdx == 10) {
+            if (pickNdx > 5 && pickNdx < 11) {
               tag.style.display = 'block';
 
               tag.style.left = e.clientX - 35 + 'px';
               tag.style.top = e.clientY - 50 + 'px';
-              tag.innerHTML = tagContent[pickNdx][0];
+
+              if (langMode == "en") {
+                tag.innerHTML = tagContent[pickNdx][0];
+              } else {
+                tag.innerHTML = tagContent[pickNdx][2];
+              }
+
 
               isPicked = true;
 
