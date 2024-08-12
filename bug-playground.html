@@ -36,8 +36,8 @@
 
     <div id="title-area">
       <h4>Calm Down</h4>
-      <p>And make bugs a playground 😉</p><br>
-      <p>Currently only functionable on desktop</p>
+      <p>And make bugs a playground 😉</p>
+      <p style="font-size: 12px;">( currently only responsive on desktop )</p>
     </div>
     <canvas id="canvas"></canvas>
     <script id="vertex-shader-3d" type="x-shader/x-vertex">
@@ -93,21 +93,20 @@
       //projection & view
       const fieldOfViewRadians = degToRad(60);
       const up = [0, 1, 0];
-      let cameraPosition = [120, 55, 120], targetPosition = [0, 0, 0];
+      let cameraPosition = [150, 60, 150], targetPosition = [0, 0, 0];
       let cameraMatrix = m4.lookAt(cameraPosition, targetPosition, up, m4.identity());
       let viewMatrix = m4.inverse(cameraMatrix);
 
       //objects
       const width = 15.6, height = 10;
       const rowNum = 5, columnNum = 5;
-      let gapW = 50, gapH = 50;
+      let gapW = 25, gapH = 25;
 
       let objects = [];
       const uniformsThatAreComputedForEachObject = {
         u_worldViewProjection: m4.identity(),
       };
 
-      let initialAnimation = true;
       let objectPicked = 1;
 
       //create frame buffer
@@ -202,9 +201,7 @@
 
           });
 
-          if (initialAnimation) {
-            requestAnimationFrame(shrink);
-          }
+            shrink();
 
           //console.log('drawscene');
         }
@@ -401,8 +398,8 @@
         function onMouseDown() {
 
           objects.forEach(function (object) {
-            object.yTranslation=0;
-            object.colorUniforms.u_colorMult=[0.05, 0.3, 0.8, 0.55];
+            object.yTranslation = 0;
+            object.colorUniforms.u_colorMult = [0.05, 0.3, 0.8, 0.55];
           });
 
           drawScene();
@@ -410,38 +407,9 @@
         }
         function shrink() {
 
-          if (gapH > 25) { //这个就是最终的位移值
-            gapH -= 5; //速度
-            gapW -= 5;
-
-            for (var i = 0; i < rowNum; i++) {
-
-              for (var j = 0; j < columnNum; j++) {
-
-                objects[(j + columnNum * i) * 4].xTranslation = - (width + gapW) * (i - rowNum / 2) - width / 2 - gapW / 2;
-                objects[(j + columnNum * i) * 4 + 1].xTranslation = - (width + gapW) * (i - rowNum / 2) - width / 2 - gapW / 2;
-                objects[(j + columnNum * i) * 4 + 2].xTranslation = -(width + gapW) * (i - rowNum / 2) - width - gapW / 2;
-                objects[(j + columnNum * i) * 4 + 3].xTranslation = -(width + gapW) * (i - rowNum / 2) - gapW / 2;
-
-                objects[(j + columnNum * i) * 4].zTranslation = (j - columnNum / 2) * (width + gapH) + gapH / 2;
-                objects[(j + columnNum * i) * 4 + 1].zTranslation = (j - columnNum / 2) * (width + gapH) + width + gapH / 2;
-                objects[(j + columnNum * i) * 4 + 2].zTranslation = (j - columnNum / 2) * (width + gapH) + width / 2 + gapH / 2;
-                objects[(j + columnNum * i) * 4 + 3].zTranslation = (j - columnNum / 2) * (width + gapH) + width / 2 + gapH / 2;
-
-              }
-
-            }
-
-            requestAnimationFrame(drawScene);
-            //console.log('shrink');
-
-          } else {
-            initialAnimation = false;
-
-            window.addEventListener('resize', drawScene, false);
-            window.addEventListener('mousemove', renderPicking, false);
-            window.addEventListener('mousedown', onMouseDown, false);
-          }
+          window.addEventListener('resize', drawScene, false);
+          window.addEventListener('mousemove', renderPicking, false);
+          window.addEventListener('mousedown', onMouseDown, false);
 
         }
 
