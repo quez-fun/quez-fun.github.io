@@ -175,12 +175,13 @@
         [], //2
         [], //3
         [], //4
-        [], //5
-        ['composite', 'https://quez-fun.github.io/exhibition_composite.html', '综合'], //6
-        ['solar', 'https://quez-fun.github.io/solar/', '太阳能'], //7
-        ['mini-pano', 'https://quez-fun.github.io/mini-panorama/', '迷你全景'], //8
-        ['vist gallery', 'https://quez-fun.github.io/gallery.html', '参观画廊'], //9
-        ['booth', 'https://quez-fun.github.io/exhibition_booth.html', '展厅'], //10
+        ['Relax!', './bug-playground.html', '放松！'], //5
+        ['composite', './exhibition_composite.html', '综合'], //6
+        ['solar', './solar/', '太阳能'], //7
+        ['mini-pano', './mini-panorama/', '迷你全景'], //8
+        ['vist gallery', './gallery.html', '参观画廊'], //9
+        ['booth', './exhibition_booth.html', '展厅'], //10
+  
       ];
 
       //canvas & context
@@ -390,7 +391,7 @@
 
             pickNdx = (pixels[0] - 1) * rowNum + pixels[1];
 
-            if (pickNdx > 5 && pickNdx < 11) {
+            if (pickNdx > 4 && pickNdx < 11) {
               tag.style.display = 'block';
 
               tag.style.left = e.clientX - 35 + 'px';
@@ -401,7 +402,6 @@
               } else {
                 tag.innerHTML = tagContent[pickNdx][2];
               }
-
 
               isPicked = true;
 
@@ -418,7 +418,7 @@
               objects[(pickNdx - 1) * 4 + 3].colorUniforms.u_colorMult = [0.5, 0.3, 0.8, 0.55];
 
               oldPickNdx = pickNdx;
-
+              isPicked = false;
               drawScene();
 
             } else {
